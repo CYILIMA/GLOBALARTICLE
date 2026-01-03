@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GLOBAL ARTICLES | Breaking & Latest News</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS FILE -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="top-bar">
+    <div class="logo" onclick="goHome()">GLOBAL <span>ARTICLES</span></div>
+
+    <nav>
+      <ul>
+        <li><a onclick="filterNews('all')">HOME</a></li>
+        <li><a onclick="filterNews('politics')">POLITICS</a></li>
+        <li><a onclick="filterNews('health')">HEALTH</a></li>
+        <li><a onclick="filterNews('economics')">ECONOMICS</a></li>
+        <li><a onclick="filterNews('technology')">TECHNOLOGY</a></li>
+        <li><a onclick="filterNews('documentary')">DOCUMENTARIES</a></li>
+        <li><a onclick="filterNews('entertainment')">ENTERTAINMENT</a></li>
+        <li><a onclick="filterNews('sports')">SPORTS</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="breaking">
+    <img id="breakingImg" alt="">
+    <span id="breakingTitle">Breaking News</span>
+  </div>
+</header>
+
+<main class="container">
+  <!-- NEWS WILL BE LOADED HERE BY JS -->
+  <section id="newsArea"></section>
+
+  <aside class="sidebar">
+    <h3>TOP NEWS (This Week)</h3>
+    <ul id="topNews"></ul>
+
+    <h3>LATEST NEWS</h3>
+    <ul id="latestNews"></ul>
+  </aside>
+</main>
+
+<footer>
+  <div class="subscribe">
+    <strong>Subscribe for instant breaking news</strong>
+    <input type="email" id="email" placeholder="Enter your email">
+    <button onclick="subscribe()">SUBSCRIBE</button>
+  </div>
+
+  <div class="footer-links">
+    <div>
+      <strong>QUICK LINKS</strong>
+      <a href="#">About Us</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms & Conditions</a>
+    </div>
+
+    <div>
+      <strong>CONTACT US</strong>
+      <div class="contact-inline">
+        <a href="tel:+250796306573"><img src="./new call.jpg"> Call</a>
+        <a href="https://wa.me/250796306573"><img src="./new whatsapp.jpg"> WhatsApp</a>
+        <a href="mailto:yourmail@example.com"><img src="./gmail logo.jpg"> Email</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="socials">
+    <a href="#"><img src="./new facebook.jpg">Facebook</a>
+    <a href="#"><img src="./instagram logo.jpg">Instagram</a>
+    <a href="#"><img src="./x logo.jpg">X</a>
+    <a href="#"><img src="./youtube logo.jpg">YouTube</a>
+  </div>
+
+  <div class="copyright">
+    © 2025 GLOBAL ARTICLES. All Rights Reserved.
+  </div>
+</footer>
+
+<!-- JS FILE -->
+<script src="script.js"></script>
+</body>
+</html>

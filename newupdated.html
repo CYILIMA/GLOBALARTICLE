@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GLOBAL ARTICLES | Breaking & Latest News</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./UPDATED.css">
+</head>
+<body>
+
+<header>
+  <div class="top-bar">
+    <div class="logo" onclick="goHome()">GLOBAL <span>ARTICLES</span></div>
+
+    <!-- Hamburger -->
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav">
+      <ul>
+        <li><a onclick="filterNews('all')">HOME</a></li>
+        <li><a onclick="filterNews('politics')">POLITICS</a></li>
+        <li><a onclick="filterNews('health')">HEALTH</a></li>
+        <li><a onclick="filterNews('economics')">ECONOMICS</a></li>
+        <li><a onclick="filterNews('technology')">TECHNOLOGY</a></li>
+        <li><a onclick="filterNews('documentary')">DOCUMENTARIES</a></li>
+        <li><a onclick="filterNews('entertainment')">ENTERTAINMENT</a></li>
+        <li><a onclick="filterNews('sports')">SPORTS</a></li>
+      </ul>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <nav id="mobileNav">
+      <div class="close-btn" onclick="toggleMenu()">✕</div>
+      <ul>
+        <li><a onclick="filterNews('all'); toggleMenu()">HOME</a></li>
+        <li><a onclick="filterNews('politics'); toggleMenu()">POLITICS</a></li>
+        <li><a onclick="filterNews('health'); toggleMenu()">HEALTH</a></li>
+        <li><a onclick="filterNews('economics'); toggleMenu()">ECONOMICS</a></li>
+        <li><a onclick="filterNews('technology'); toggleMenu()">TECHNOLOGY</a></li>
+        <li><a onclick="filterNews('documentary'); toggleMenu()">DOCUMENTARIES</a></li>
+        <li><a onclick="filterNews('entertainment'); toggleMenu()">ENTERTAINMENT</a></li>
+        <li><a onclick="filterNews('sports'); toggleMenu()">SPORTS</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="breaking" id="breakingText">
+    Breaking News will appear here
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- NEWS WILL BE INSERTED HERE LATER -->
+  <section id="newsArea">
+    <!-- Dynamic news articles will be loaded here -->
+  </section>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>TOP NEWS</h3>
+    <ul id="topNews">
+      <li>No top news yet</li>
+    </ul>
+
+    <h3>LATEST NEWS</h3>
+    <ul id="latestNews">
+      <li>No latest news yet</li>
+    </ul>
+  </aside>
+
+</main>
+
+<footer>
+  <div class="subscribe">
+    <strong>Subscribe for breaking news</strong>
+    <input type="email" id="email" placeholder="Enter your email">
+    <button onclick="subscribe()">SUBSCRIBE</button>
+  </div>
+
+  <div class="footer-links">
+    <div>
+      <strong>QUICK LINKS</strong>
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms & Conditions</a>
+    </div>
+
+    <div>
+      <strong>CONTACT US</strong>
+      <div class="contact-inline">
+        <a href="tel:+250796306573">📞</a>
+        <a href="https://wa.me/250796306573">💬</a>
+        <a href="mailto:yourmail@example.com">✉️</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="socials">
+    <a>Facebook</a>
+    <a>Instagram</a>
+    <a>X</a>
+    <a>YouTube</a>
+  </div>
+
+  <div class="copyright">
+    © 2025 GLOBAL ARTICLES. All Rights Reserved.
+  </div>
+</footer>
+
+<script src="./UPDATEDJAAVAS.js"></script>
+</body>
+</html>
