@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // Use View Composer to share data only when 'layouts.main' is rendered
+        // This prevents database queries on admin routes or API routes
+        \Illuminate\Support\Facades\View::composer('layouts.main', function ($view) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('news')) {
+                    $breakingNews = \App\Models\News::where('breaking', true)->latest()->take(5)->get();
+                    $view->with('globalBreakingNews', $breakingNews);
+                }
+            } catch (\Exception $e) {
+                // Ignore DB errors during setup
+            }
+        });
+
+        // Share sidebarLatest with home view
+        \Illuminate\Support\Facades\View::composer('home', function ($view) {
+             try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('news')) {
+                    $sidebarLatest = \App\Models\News::latest()->take(5)->get();
+                    $view->with('sidebarLatest', $sidebarLatest);
+                }
+            } catch (\Exception $e) {
+                // Ignore during setup
+            }
+        });
+    }
+}
