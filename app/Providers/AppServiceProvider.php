@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
             try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('news')) {
                     $breakingNews = \App\Models\News::where('breaking', true)
+                        ->where('status', 'published')
                         ->where(function($q) {
                             $q->whereNull('breaking_expires_at')
                               ->orWhere('breaking_expires_at', '>', now());

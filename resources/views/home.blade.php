@@ -37,8 +37,8 @@
         @forelse($sidebarLatest ?? [] as $latest)
             <li>
                 <a href="{{ route('news.show', $latest) }}">
-                    <span style="display:block; font-weight:500;">{{ Str::limit($latest->title, 60) }}</span>
-                    <small style="color:#666; font-size:11px;">{{ $latest->created_at->diffForHumans() }}</small>
+                    <span class="headline-title">{{ Str::limit($latest->title, 70) }}</span>
+                    <span class="headline-time">{{ $latest->created_at->diffForHumans() }}</span>
                 </a>
             </li>
         @empty
@@ -46,4 +46,33 @@
         @endforelse
     </ul>
   </aside>
+
+  <!-- DOCUMENTARY SECTION -->
+  @if($documentaries->count() > 0)
+  <section id="documentaryArea" style="margin-top: 40px; grid-column: 1 / -1;">
+      <h2>Featured Documentaries</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+          @foreach($documentaries as $documentary)
+          <a href="{{ route('documentaries.show', $documentary) }}" class="news-card" style="text-decoration: none; transition: transform 0.3s;">
+              @if($documentary->thumbnail)
+                  <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="{{ $documentary->title }}" loading="lazy" style="border-radius: 8px;">
+              @else
+                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; border-radius: 8px; display: flex; align-items: center; justify-center; color: white; font-size: 48px;">
+                      🎬
+                  </div>
+              @endif
+              <div class="news-content">
+                  <small style="color: #667eea; font-weight: bold;">DOCUMENTARY</small>
+                  <h3>{{ $documentary->title }}</h3>
+                  <p>{{ Str::limit($documentary->description, 120) }}</p>
+                  <div style="margin-top: 10px; font-size: 13px; color: #555; display: flex; justify-content: space-between;">
+                      <span>{{ $documentary->published_at->diffForHumans() }}</span>
+                      <span>👁️ {{ number_format($documentary->views) }} views</span>
+                  </div>
+              </div>
+          </a>
+          @endforeach
+      </div>
+  </section>
+  @endif
 @endsection

@@ -18,9 +18,13 @@ class NewsController extends Controller
 
         $news = $query->where('status', 'published')->latest()->get();
 
+        // Get published documentaries for homepage
+        $documentaries = \App\Models\Documentary::published()->latest()->take(6)->get();
+
         return view('home', [
             'news' => $news,
-            'category' => $request->category
+            'category' => $request->category,
+            'documentaries' => $documentaries,
         ]);
     }
 
@@ -98,6 +102,11 @@ class NewsController extends Controller
                     // Continue to next subscriber
                 }
             }
+        }
+
+        // Create notification for admin
+        if ($news->status == 'published') {
+            \App\Services\NotificationService::articlePublished(auth()->id(), $news);
         }
 
         return redirect()->route('dashboard')->with('success', 'News article created successfully!');

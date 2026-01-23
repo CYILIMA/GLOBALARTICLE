@@ -12,7 +12,7 @@
                 <a href="{{ route('dashboard', ['status' => 'scheduled']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'scheduled' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Scheduled</a>
             </div>
 
-            <a href="{{ route('news.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition flex items-center gap-2">
+            <a href="{{ route('news.create') }}" class="text-sm font-bold py-2 px-4 rounded transition flex items-center gap-2 border" style="background: var(--button-bg); color: var(--button-text); border-color: var(--button-border);">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 New Article
             </a>

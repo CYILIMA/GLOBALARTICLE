@@ -15,62 +15,62 @@
 <header>
   <div class="top-bar">
     <div class="logo" onclick="window.location='{{ url('/') }}'">GLOBAL <span>ARTICLES</span></div>
-        <!-- Hamburger -->
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
-
- <!-- Desktop Nav -->
-
+    
     <nav class="desktop-nav">
       <ul>
-        <li><a href="{{ url('/') }}">HOME</a></li>
-        <li><a href="{{ url('/?category=politics') }}">POLITICS</a></li>
-        <li><a href="{{ url('/?category=technology') }}">TECHNOLOGY</a></li>
-        <li><a href="{{ url('/?category=sports') }}">SPORTS</a></li>
-        <li><a href="{{ url('/?category=entertainment') }}">ENTERTAINMENT</a></li>
-        <li><a href="{{ url('/?category=economy') }}">ECONOMY</a></li>
-        <li><a href="{{ url('/?category=health') }}">HEALTH</a></li>
-        <li><a href="{{ url('/?category=documentary') }}">DOCUMENTARIES</a></li>
-        <li><a href="{{ url('/?category=religion') }}">RELIGION</a></li>
+        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/?category=politics') }}" class="{{ request('category') == 'politics' ? 'active' : '' }}">POLITICS</a></li>
+        <li><a href="{{ url('/?category=technology') }}" class="{{ request('category') == 'technology' ? 'active' : '' }}">TECHNOLOGY</a></li>
+        <li><a href="{{ url('/?category=sports') }}" class="{{ request('category') == 'sports' ? 'active' : '' }}">SPORTS</a></li>
+        <li><a href="{{ url('/?category=entertainment') }}" class="{{ request('category') == 'entertainment' ? 'active' : '' }}">ENTERTAINMENT</a></li>
+        <li><a href="{{ url('/?category=economy') }}" class="{{ request('category') == 'economy' ? 'active' : '' }}">ECONOMY</a></li>
+        <li><a href="{{ url('/?category=health') }}" class="{{ request('category') == 'health' ? 'active' : '' }}">HEALTH</a></li>
+        <li><a href="{{ url('/?category=religion') }}" class="{{ request('category') == 'religion' ? 'active' : '' }}">RELIGION</a></li>
       </ul>
     </nav>
+
+    <div class="header-right" style="display: flex; align-items: center; gap: 15px; margin-left: 20px;">
+        <!-- Theme Toggle -->
+        <button id="themeToggle" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" style="background: none; border: none; cursor: pointer; font-size: 20px; padding: 5px; color: var(--text-main); display: flex; align-items: center; justify-content: center; transition: transform 0.3s;" title="Toggle Theme">
+            <span id="themeIcon">🌙</span>
+        </button>
+
+        <!-- Hamburger -->
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+    </div>
      <!-- Mobile Nav -->
     <nav id="mobileNav">
       <div class="close-btn" onclick="toggleMenu()">✕</div>
       <ul>
-        <li><a href="{{ url('/') }}">HOME</a></li>
-        <li><a href="{{ url('/?category=politics') }}">POLITICS</a></li>
-        <li><a href="{{ url('/?category=technology') }}">TECHNOLOGY</a></li>
-        <li><a href="{{ url('/?category=sports') }}">SPORTS</a></li>
-        <li><a href="{{ url('/?category=entertainment') }}">ENTERTAINMENT</a></li>
-        <li><a href="{{ url('/?category=economy') }}">ECONOMY</a></li>
-        <li><a href="{{ url('/?category=health') }}">HEALTH</a></li>
-        <li><a href="{{ url('/?category=documentary') }}">DOCUMENTARIES</a></li>
-        <li><a href="{{ url('/?category=religion') }}">RELIGION</a></li>
+        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/?category=politics') }}" class="{{ request('category') == 'politics' ? 'active' : '' }}">POLITICS</a></li>
+        <li><a href="{{ url('/?category=technology') }}" class="{{ request('category') == 'technology' ? 'active' : '' }}">TECHNOLOGY</a></li>
+        <li><a href="{{ url('/?category=sports') }}" class="{{ request('category') == 'sports' ? 'active' : '' }}">SPORTS</a></li>
+        <li><a href="{{ url('/?category=entertainment') }}" class="{{ request('category') == 'entertainment' ? 'active' : '' }}">ENTERTAINMENT</a></li>
+        <li><a href="{{ url('/?category=economy') }}" class="{{ request('category') == 'economy' ? 'active' : '' }}">ECONOMY</a></li>
+        <li><a href="{{ url('/?category=health') }}" class="{{ request('category') == 'health' ? 'active' : '' }}">HEALTH</a></li>
+        <li><a href="{{ url('/?category=religion') }}" class="{{ request('category') == 'religion' ? 'active' : '' }}">RELIGION</a></li>
       </ul>
     </nav>
   </div>
 
-  <div class="breaking">
-    @if(session('success'))
-        <div style="background: green; color: white; padding: 10px; text-align: center; font-weight: bold;">
-            {{ session('success') }}
-        </div>
-    @elseif(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
-        <!-- Normal Breaking News -->
-        <div class="breaking-label">Breaking News</div>
-        <marquee scrollamount="6" style="flex:1; padding: 10px;">
-            @foreach($globalBreakingNews as $bItem)
-                <span style="margin-right: 40px; color: #fff;">★ {{ $bItem->title }}</span>
-            @endforeach
-        </marquee>
-    @endif
-    
-    @if($errors->any())
-        <div style="background: #e63946; color: white; padding: 10px; text-align: center;">
-            {{ $errors->first() }}
-        </div>
-    @endif
+  @if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
+  @php $bannerStory = $globalBreakingNews->first(); @endphp
+  <div class="breaking-banner">
+    <a href="{{ route('news.show', $bannerStory) }}" class="breaking-link">
+      <span class="breaking-pulse">🔴</span> 
+      <span class="breaking-label-new">BREAKING:</span> 
+      <span class="breaking-title">{{ $bannerStory->title }}</span>
+      <span class="breaking-cta">Read more →</span>
+    </a>
   </div>
+  @elseif(session('success'))
+  <div class="breaking-success">
+      <div style="background: green; color: white; padding: 10px; text-align: center; font-weight: bold; width: 100%;">
+          {{ session('success') }}
+      </div>
+  </div>
+  @endif
 </header>
 
 <main class="container">
@@ -131,7 +131,6 @@
             <a href="{{ url('/?category=entertainment') }}">Entertainment</a>
             <a href="{{ url('/?category=economy') }}">Economy</a>
             <a href="{{ url('/?category=health') }}">Health</a>
-            <a href="{{ url('/?category=documentary') }}">Docu</a>
             <a href="{{ url('/?category=religion') }}">Religion</a>
         </div>
     </div>
@@ -164,6 +163,32 @@
         const nav = document.getElementById('mobileNav');
         nav.classList.toggle('active');
     }
+
+    // Theme Toggle Logic
+    const toggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.classList.add('dark');
+        themeIcon.textContent = '☀️';
+    } else {
+        html.classList.remove('dark');
+        themeIcon.textContent = '🌙';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        if (html.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+            themeIcon.textContent = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            themeIcon.textContent = '🌙';
+        }
+    });
 </script>
 </body>
 </html>

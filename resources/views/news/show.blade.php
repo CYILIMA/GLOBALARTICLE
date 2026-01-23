@@ -33,16 +33,52 @@
         {!! $news->content !!}
     </div>
 
-    <!-- Share / Footer (Simplified) -->
-    <div class="border-t border-gray-200 pt-6 mb-12">
-        <h4 class="text-sm font-bold text-gray-500 uppercase mb-3">Share this article</h4>
-        <div class="flex gap-4">
-            <!-- Placeholders for social share -->
-            <a href="#" class="text-gray-400 hover:text-blue-600 transition"><i class="fab fa-twitter text-xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-blue-800 transition"><i class="fab fa-facebook text-xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-blue-500 transition"><i class="fab fa-linkedin text-xl"></i></a>
+    <!-- Comments Section -->
+    <section class="bg-gray-50 rounded-xl p-8 mb-12">
+        <h3 class="text-xl font-bold mb-6">Comments</h3>
+
+        <!-- Comment Form -->
+        <form action="{{ route('comments.store', $news) }}" method="POST" class="bg-white rounded-lg p-6 mb-8 shadow-sm">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input type="text" name="author_name" required class="w-full border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Email</label>
+                    <input type="email" name="author_email" required class="w-full border-gray-300 rounded-lg">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Comment</label>
+                <textarea name="content" rows="4" required class="w-full border-gray-300 rounded-lg" placeholder="Share your thoughts..."></textarea>
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
+                Post Comment
+            </button>
+        </form>
+
+        <!-- Approved Comments -->
+        <div class="space-y-4">
+            @forelse($news->comments()->approved()->latest()->get() as $comment)
+                <div class="bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="h-10 w-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                            {{ substr($comment->author_name, 0, 1) }}
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">{{ $comment->author_name }}</h4>
+                            <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 ml-13">{{ $comment->content }}</p>
+                </div>
+            @empty
+                <p class="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
+            @endforelse
         </div>
-    </div>
+    </section>
 
     <!-- Related News -->
     @if($relatedNews->count() > 0)
