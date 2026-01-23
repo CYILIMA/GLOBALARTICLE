@@ -11,12 +11,14 @@
       @forelse($news as $item)
         <div class="news-card">
             @if($item->image)
-                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" loading="lazy">
+                <a href="{{ route('news.show', $item) }}">
+                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" loading="lazy">
+                </a>
             @endif
             <div class="news-content">
-                <small>{{ $item->category }}</small>
-                <h3>{{ $item->title }}</h3>
-                <p>{{ Str::limit($item->content, 150) }}</p>
+                <a href="{{ route('home', ['category' => $item->category]) }}" class="category-link"><small>{{ $item->category }}</small></a>
+                <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
+                <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                 <div style="margin-top: 10px; font-size: 13px; color: #555;">{{ $item->created_at->diffForHumans() }}</div>
             </div>
         </div>
@@ -34,7 +36,7 @@
     <ul id="latestNews">
         @forelse($sidebarLatest ?? [] as $latest)
             <li>
-                <a href="#">
+                <a href="{{ route('news.show', $latest) }}">
                     <span style="display:block; font-weight:500;">{{ Str::limit($latest->title, 60) }}</span>
                     <small style="color:#666; font-size:11px;">{{ $latest->created_at->diffForHumans() }}</small>
                 </a>

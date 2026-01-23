@@ -24,7 +24,14 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\View::composer('layouts.main', function ($view) {
             try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('news')) {
-                    $breakingNews = \App\Models\News::where('breaking', true)->latest()->take(5)->get();
+                    $breakingNews = \App\Models\News::where('breaking', true)
+                        ->where(function($q) {
+                            $q->whereNull('breaking_expires_at')
+                              ->orWhere('breaking_expires_at', '>', now());
+                        })
+                        ->latest()
+                        ->take(5)
+                        ->get();
                     $view->with('globalBreakingNews', $breakingNews);
                 }
             } catch (\Exception $e) {

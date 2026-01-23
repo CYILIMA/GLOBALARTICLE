@@ -104,11 +104,20 @@
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 Dashboard
             </a>
+            <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.index') ? 'active' : '' }}">
+                Articles
+            </a>
             <a href="{{ route('news.create') }}" class="{{ request()->routeIs('news.create') ? 'active' : '' }}">
                 + Add Article
             </a>
             <a href="{{ route('admin.subscribers') }}" class="{{ request()->routeIs('admin.subscribers') ? 'active' : '' }}">
                 Subscribers
+            </a>
+            <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                Categories
+            </a>
+            <a href="{{ route('admin.media.index') }}" class="{{ request()->routeIs('admin.media.index') ? 'active' : '' }}">
+                Media Library
             </a>
             
             <form method="POST" action="{{ route('logout') }}" class="mt-10 border-t pt-4" style="border-color: var(--border-color)">
@@ -213,6 +222,6 @@
             }
         });
     </script>
-
+    @stack('scripts')
 </body>
 </html>

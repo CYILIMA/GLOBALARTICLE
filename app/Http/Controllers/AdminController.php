@@ -13,6 +13,11 @@ class AdminController extends Controller
         $totalSubscribers = \App\Models\Subscriber::count();
         $breakingCount = News::where('breaking', 1)->count();
         
+        // New metrics for Admin Upgrade
+        $draftsCount = News::where('status', 'draft')->count();
+        $scheduledCount = News::where('status', 'scheduled')->count();
+        $publishedCount = News::where('status', 'published')->count();
+
         $latestArticles = News::latest()->take(5)->get();
         $recentSubscribers = \App\Models\Subscriber::latest()->take(5)->get();
 
@@ -20,6 +25,9 @@ class AdminController extends Controller
             'totalNews', 
             'totalSubscribers', 
             'breakingCount', 
+            'draftsCount',
+            'scheduledCount',
+            'publishedCount',
             'latestArticles', 
             'recentSubscribers'
         ));
@@ -67,5 +75,18 @@ class AdminController extends Controller
 
         $subscribers = $query->paginate(20);
         return view('admin.subscribers.index', compact('subscribers'));
+    }
+
+    public function news(Request $request)
+    {
+        $query = News::with('categoryData')->latest();
+
+        if ($request->has('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $latestArticles = $query->paginate(15);
+        
+        return view('admin.news.index', compact('latestArticles'));
     }
 }

@@ -12,12 +12,33 @@ class News extends Model
     protected $fillable = [
         'title',
         'content',
-        'category',
+        'category', // Legacy string
+        'category_id', // New relation
         'image',
-        'breaking'
+        'breaking',
+        'status',
+        'published_at',
+        'scheduled_at',
+        'breaking_expires_at',
+        'meta_title',
+        'meta_description',
+        'views'
     ];
 
     protected $casts = [
         'breaking' => 'boolean',
+        'published_at' => 'datetime',
+        'scheduled_at' => 'datetime',
+        'breaking_expires_at' => 'datetime',
     ];
+
+    public function categoryData()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
 }
