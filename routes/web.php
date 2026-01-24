@@ -8,7 +8,16 @@ use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', [NewsController::class, 'index'])->name('home');
+
+// Admin-specific news routes (must come before wildcard)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
+    Route::get('/news/{news}/edit', [NewsController::class, 'edit'])->name('news.edit');
+});
+
+// Public news routes (wildcard must come after specific routes)
 Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
+
 Route::get('/documentaries/{documentary}', [App\Http\Controllers\DocumentaryController::class, 'show'])->name('documentaries.show');
 Route::redirect('/documentaries', '/#documentaryArea');
 Route::post('/news/{news}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
@@ -20,11 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
     // News Management
-    // News Management
     Route::get('/dashboard/news', [AdminController::class, 'news'])->name('admin.news.index');
-    Route::get('/news/create', [NewsController::class, 'create'])->name('news.create');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
-    Route::get('/news/{news}/edit', [NewsController::class, 'edit'])->name('news.edit');
     Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
     Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
 
