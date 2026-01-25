@@ -63,7 +63,7 @@
                     </div>
                 
                     <div wire:ignore class="prose dark:prose-invert max-w-none">
-                        <textarea x-ref="input" name="content" id="content" required class="hidden"></textarea>
+                        <textarea x-ref="input" name="content" id="content" class="hidden"></textarea>
                         <div x-ref="editor"></div>
                     </div>
                 </div>

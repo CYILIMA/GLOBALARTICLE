@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('news', function (Blueprint $table) {
-            //
+            $table->timestamp('breaking_expires_at')->nullable()->after('breaking');
         });
     }
 

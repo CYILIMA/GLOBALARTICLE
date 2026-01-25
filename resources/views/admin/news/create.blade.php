@@ -44,7 +44,7 @@
                 </div>
 
                 <!-- Content -->
-                <div>
+                <div x-data="richEditor('')">
                     <div class="flex justify-between items-center mb-2">
                         <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Article Content</label>
                         <button type="button" @click="$dispatch('open-media-modal')" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md transition flex items-center gap-2">
@@ -52,14 +52,16 @@
                             Insert from Media Library
                         </button>
                     </div>
-                    <textarea name="content" id="content" rows="12" required 
-                              class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white font-mono text-sm leading-relaxed" 
-                              placeholder="Write your article here..."></textarea>
+                    <div class="prose dark:prose-invert max-w-none">
+                        <textarea x-ref="input" name="content" id="content" class="hidden"></textarea>
+                        <div x-ref="editor"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- SIDEBAR SETTINGS -->
             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+                <!-- ... (Sidebar settings content remains same, just ensuring context match) -->
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 border-b pb-2 dark:border-gray-700">Publishing Settings</h3>
 
                 <!-- Featured Image -->
@@ -130,42 +132,3 @@
     .dark .ck.ck-button { color: #f3f4f6; }
     .dark .ck.ck-button:hover { background-color: #374151; }
 </style>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if(document.querySelector('#content')){
-            let editorInstance;
-
-            if (typeof window.ClassicEditor !== 'undefined') {
-                window.ClassicEditor
-                    .create(document.querySelector('#content'), {
-                        toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo']
-                    })
-                    .then(editor => {
-                         editorInstance = editor;
-                         console.log( 'Editor was initialized', editor );
-                    })
-                    .catch(error => {
-                        console.error('CKEditor Init Error:', error);
-                    });
-            } else {
-                console.error('ClassicEditor is not defined on window.');
-            }
-
-            // Listen for media selection
-            window.addEventListener('media-selected', event => {
-                if(editorInstance) {
-                    const { url, type, alt, name } = event.detail;
-                    if(type === 'image') {
-                        // Use execute 'insertImage' if plugin is available, otherwise insert HTML
-                        editorInstance.execute('insertImage', { source: url });
-                    } else {
-                         editorInstance.model.change(writer => {
-                             const link = writer.createText( name, { linkHref: url } );
-                             editorInstance.model.insertContent( link, editorInstance.model.document.selection );
-                         });
-                    }
-                }
-            });
-        }
-    });
-</script>
