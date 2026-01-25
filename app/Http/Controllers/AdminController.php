@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\News;
+use App\Models\Subscriber;
 
 class AdminController extends Controller
 {
     public function index()
     {
         $totalNews = News::count();
-        $totalSubscribers = \App\Models\Subscriber::count();
+        $totalSubscribers = Subscriber::count();
         $breakingCount = News::where('breaking', 1)->count();
         
         // New metrics for Admin Upgrade
@@ -19,7 +20,7 @@ class AdminController extends Controller
         $publishedCount = News::where('status', 'published')->count();
 
         $latestArticles = News::latest()->take(5)->get();
-        $recentSubscribers = \App\Models\Subscriber::latest()->take(5)->get();
+        $recentSubscribers = Subscriber::latest()->take(5)->get();
 
         return view('dashboard', compact(
             'totalNews', 
@@ -35,7 +36,7 @@ class AdminController extends Controller
 
     public function subscribers(Request $request)
     {
-        $query = \App\Models\Subscriber::latest();
+        $query = Subscriber::latest();
 
         if ($request->has('search')) {
             $query->where('email', 'like', '%' . $request->search . '%');
@@ -79,7 +80,7 @@ class AdminController extends Controller
 
     public function toggleSubscriberStatus($id)
     {
-        $subscriber = \App\Models\Subscriber::findOrFail($id);
+        $subscriber = Subscriber::findOrFail($id);
         $newStatus = $subscriber->status === 'active' ? 'unsubscribed' : 'active';
         $subscriber->update(['status' => $newStatus]);
 
@@ -88,7 +89,7 @@ class AdminController extends Controller
 
     public function deleteSubscriber($id)
     {
-        $subscriber = \App\Models\Subscriber::findOrFail($id);
+        $subscriber = Subscriber::findOrFail($id);
         $subscriber->delete();
 
         return back()->with('success', 'Subscriber permanently deleted.');

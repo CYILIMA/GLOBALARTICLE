@@ -176,8 +176,10 @@
     </div>
   </div>
 
-  <div class="copyright">
-    &copy; {{ date('Y') }} Global Articles. No rights reserved (Demo).
+  <div class="footer-bottom">
+    <div class="container" style="text-align: center;">
+      <p>&copy; 2026 Global Articles. Demo project.</p>
+    </div>
   </div>
 </footer>
 

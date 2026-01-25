@@ -21,10 +21,14 @@ class NewsController extends Controller
         // Get published documentaries for homepage
         $documentaries = \App\Models\Documentary::published()->latest()->take(6)->get();
 
+        // Get latest news for sidebar (always show top 5 regardless of category filter)
+        $sidebarLatest = News::where('status', 'published')->latest()->take(5)->get();
+
         return view('home', [
             'news' => $news,
             'category' => $request->category,
             'documentaries' => $documentaries,
+            'sidebarLatest' => $sidebarLatest,
         ]);
     }
 
