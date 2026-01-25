@@ -304,23 +304,18 @@ header {
 
 .subscribe-container h3 {
   color: var(--sub-text);
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 22px;
   font-family: var(--font-heading);
 }
 
-.subscribe-container p {
-  color: var(--sub-muted);
-  font-size: 14px;
-  margin-top: 15px;
-}
-
-.subscribe-container form {
+.subscribe-wrapper {
   display: flex;
   justify-content: center;
   gap: 12px;
-  max-width: 600px;
+  max-width: 500px;
   margin: 0 auto;
+  position: relative;
 }
 
 .subscribe-container input {
@@ -344,19 +339,61 @@ header {
   background: var(--accent-color);
   color: white;
   border: none;
-  padding: 14px 30px;
+  padding: 14px 25px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   transition: all 0.3s ease;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .subscribe-container button:hover {
   background: #b00000;
   transform: translateY(-2px);
+}
+
+.subscribe-container button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.subscribe-message {
+  margin-top: 15px;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 20px;
+}
+
+.msg-success {
+  color: #2ecc71;
+}
+
+.msg-error {
+  color: #e74c3c;
+}
+
+.sub-footer {
+  color: var(--sub-muted);
+  font-size: 13px;
+  margin-top: 15px;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .subscribe-wrapper {
+    flex-direction: column;
+  }
+
+  .subscribe-container button {
+    width: 100%;
+  }
 }
 
 .news-card {

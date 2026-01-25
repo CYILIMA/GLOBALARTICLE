@@ -95,14 +95,20 @@
 </main>
 
 <footer>
-  <div class="subscribe-container">
+  <div class="subscribe-container" id="subscribeSection">
     <h3>Subscribe for instant breaking news</h3>
-    <form action="{{ route('subscribe') }}" method="POST">
+    <form id="subscribeForm" action="{{ route('subscribe') }}" method="POST">
         @csrf
-        <input type="email" name="email" placeholder="Enter your email address" required>
-        <button type="submit">SUBSCRIBE</button>
+        <div class="subscribe-wrapper">
+            <input type="email" id="subEmail" name="email" placeholder="Enter your email address" required>
+            <button type="submit" id="subBtn">
+                <span class="btn-text">SUBSCRIBE</span>
+                <span class="btn-loader" style="display:none;">...</span>
+            </button>
+        </div>
+        <div id="subMessage" class="subscribe-message" style="display:none;"></div>
     </form>
-    <p style="color: #aaa; font-size: 12px; margin-top: 10px;">No spam. Unsubscribe anytime.</p>
+    <p class="sub-footer">No spam. Unsubscribe anytime.</p>
   </div>
   <div class="footer-grid">
     <div class="footer-col">
@@ -204,6 +210,58 @@
         } else {
             localStorage.setItem('theme', 'light');
             themeIcon.textContent = '🌙';
+        }
+    });
+    
+    // Subscription Form Handler
+    document.getElementById('subscribeForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const btn = document.getElementById('subBtn');
+        const btnText = btn.querySelector('.btn-text');
+        const btnLoader = btn.querySelector('.btn-loader');
+        const msgDiv = document.getElementById('subMessage');
+        const emailInput = document.getElementById('subEmail');
+        
+        // Reset state
+        msgDiv.style.display = 'none';
+        msgDiv.className = 'subscribe-message';
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
+        
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            msgDiv.style.display = 'block';
+            if (response.ok) {
+                msgDiv.textContent = data.message || 'Subscribed successfully!';
+                msgDiv.classList.add('msg-success');
+                form.reset();
+            } else {
+                msgDiv.textContent = data.message || (data.errors ? Object.values(data.errors)[0][0] : 'Subscription failed.');
+                msgDiv.classList.add('msg-error');
+            }
+        } catch (error) {
+            msgDiv.style.display = 'block';
+            msgDiv.textContent = 'Something went wrong. Please try again.';
+            msgDiv.classList.add('msg-error');
+        } finally {
+            btn.disabled = false;
+            btnText.style.display = 'inline-block';
+            btnLoader.style.display = 'none';
         }
     });
 </script>

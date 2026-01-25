@@ -36,6 +36,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Subscriber Management
     Route::get('/subscribers', [AdminController::class, 'subscribers'])->name('admin.subscribers');
+    Route::patch('/subscribers/{id}/toggle', [AdminController::class, 'toggleSubscriberStatus'])->name('admin.subscribers.toggle');
+    Route::delete('/subscribers/{id}', [AdminController::class, 'deleteSubscriber'])->name('admin.subscribers.delete');
 
     // Category Management
     Route::resource('/categories', \App\Http\Controllers\CategoryController::class)->names([

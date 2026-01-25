@@ -77,6 +77,23 @@ class AdminController extends Controller
         return view('admin.subscribers.index', compact('subscribers'));
     }
 
+    public function toggleSubscriberStatus($id)
+    {
+        $subscriber = \App\Models\Subscriber::findOrFail($id);
+        $newStatus = $subscriber->status === 'active' ? 'unsubscribed' : 'active';
+        $subscriber->update(['status' => $newStatus]);
+
+        return back()->with('success', 'Subscriber status updated to ' . ucfirst($newStatus));
+    }
+
+    public function deleteSubscriber($id)
+    {
+        $subscriber = \App\Models\Subscriber::findOrFail($id);
+        $subscriber->delete();
+
+        return back()->with('success', 'Subscriber permanently deleted.');
+    }
+
     public function news(Request $request)
     {
         $query = News::with('categoryData')->latest();

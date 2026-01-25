@@ -47,8 +47,23 @@
                                         </td>
                                         <td class="p-3">{{ $sub->created_at->format('M d, Y') }}</td>
                                         <td class="p-3">
-                                            <!-- Placeholder for edit/delete if needed -->
-                                            <span class="text-gray-400">--</span>
+                                            <div class="flex items-center gap-2">
+                                                <form method="POST" action="{{ route('admin.subscribers.toggle', $sub->id) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="text-xs px-2 py-1 rounded border {{ $sub->status == 'active' ? 'border-yellow-500 text-yellow-600 hover:bg-yellow-50' : 'border-green-500 text-green-600 hover:bg-green-50' }}">
+                                                        {{ $sub->status == 'active' ? 'Deactivate' : 'Activate' }}
+                                                    </button>
+                                                </form>
+
+                                                <form method="POST" action="{{ route('admin.subscribers.delete', $sub->id) }}" onsubmit="return confirm('Are you sure you want to permanently delete this subscriber?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-xs px-2 py-1 rounded border border-red-500 text-red-600 hover:bg-red-50">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

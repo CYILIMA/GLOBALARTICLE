@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeSubscriber;
+use App\Models\Subscriber;
 
 class SubscriberController extends Controller
 {
@@ -23,6 +24,10 @@ class SubscriberController extends Controller
             Mail::to($request->email)->send(new WelcomeSubscriber($request->email));
         } catch (\Exception $e) {
             // Log email failure but don't stop the user experience
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Thank you for subscribing! Please check your email.']);
         }
 
         return back()->with('success', 'Thank you for subscribing! Please check your email.');
