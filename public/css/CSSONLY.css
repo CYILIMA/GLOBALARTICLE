@@ -168,55 +168,97 @@ header {
 
 .breaking-banner {
   background: var(--breaking-bg);
-  height: 34px;
+  height: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  position: relative;
 }
 
-.breaking-banner:hover {
+.breaking-label-container {
   background: var(--accent-color);
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.breaking-link {
-  text-decoration: none;
-  color: #ffffff !important;
-  font-size: 13px;
-  font-weight: 600;
+  color: white;
+  height: 100%;
+  padding: 0 15px;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-  justify-content: center;
-  padding: 0 15px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  z-index: 20;
+  position: relative;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.breaking-marquee {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.breaking-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: scroll-left 40s linear infinite;
+}
+
+/* Pause animation on hover */
+.breaking-marquee:hover .breaking-track {
+  animation-play-state: paused;
+}
+
+.breaking-item {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  /* Ensure text is white on red/dark backgrounds */
+  text-decoration: none;
+  padding: 0 10px;
+  transition: opacity 0.2s;
+}
+
+.breaking-item:hover {
+  opacity: 0.8;
+}
+
+.breaking-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.breaking-cta {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 8px;
+  text-decoration: underline;
+}
+
+.breaking-separator {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 10px;
+  font-size: 12px;
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .breaking-pulse {
   font-size: 10px;
   animation: pulse-red 2s infinite;
-}
-
-.breaking-label-new {
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.breaking-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 60%;
-}
-
-.breaking-cta {
-  font-weight: 400;
-  font-size: 11px;
-  opacity: 0.9;
-  text-decoration: underline;
 }
 
 @keyframes pulse-red {
@@ -237,12 +279,13 @@ header {
 }
 
 @media (max-width: 768px) {
-  .breaking-title {
-    max-width: 50%;
+  .breaking-label-new {
+    display: none;
   }
 
-  .breaking-cta {
-    display: none;
+  /* Show only icon on very small screens */
+  .breaking-label-container {
+    padding: 0 10px;
   }
 }
 

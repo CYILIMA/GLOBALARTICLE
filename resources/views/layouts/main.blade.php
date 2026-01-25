@@ -57,12 +57,29 @@
   @if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
   @php $bannerStory = $globalBreakingNews->first(); @endphp
   <div class="breaking-banner">
-    <a href="{{ route('news.show', $bannerStory) }}" class="breaking-link">
-      <span class="breaking-pulse">🔴</span> 
-      <span class="breaking-label-new">BREAKING:</span> 
-      <span class="breaking-title">{{ $bannerStory->title }}</span>
-      <span class="breaking-cta">Read more →</span>
-    </a>
+    <div class="breaking-label-container">
+        <span class="breaking-pulse">🔴</span>
+        <span class="breaking-label-new">BREAKING</span>
+    </div>
+    <div class="breaking-marquee">
+        <div class="breaking-track">
+            @foreach($globalBreakingNews as $news)
+                <a href="{{ route('news.show', $news) }}" class="breaking-item">
+                    <span class="breaking-title">{{ $news->title }}</span>
+                    <span class="breaking-cta">Read More →</span>
+                </a>
+                <span class="breaking-separator">|</span>
+            @endforeach
+            <!-- Duplicate content for seamless infinite scroll -->
+            @foreach($globalBreakingNews as $news)
+                <a href="{{ route('news.show', $news) }}" class="breaking-item">
+                    <span class="breaking-title">{{ $news->title }}</span>
+                    <span class="breaking-cta">Read More →</span>
+                </a>
+                <span class="breaking-separator">|</span>
+            @endforeach
+        </div>
+    </div>
   </div>
   @elseif(session('success'))
   <div class="breaking-success">
