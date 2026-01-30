@@ -267,5 +267,6 @@
         }
     });
 </script>
+<script src="{{ asset('js/auto-embed.js') }}"></script>
 </body>
 </html>

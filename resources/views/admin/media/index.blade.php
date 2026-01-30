@@ -102,8 +102,19 @@
         function handleFiles(files) {
             if (!files.length) return;
             
+            const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+            const validFiles = Array.from(files).filter(file => {
+                if (file.size > MAX_SIZE) {
+                    alert(`File "${file.name}" is too large (Max 50MB).`);
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
             showLoading(true);
-            const uploads = Array.from(files).map(file => uploadFile(file));
+            const uploads = validFiles.map(file => uploadFile(file));
 
             Promise.all(uploads).then(() => {
                 loadFolder(currentFolder); // Refresh
@@ -122,10 +133,14 @@
                     headers: { 'X-CSRF-TOKEN': csrfToken },
                     body: formData
                 });
-                if (!response.ok) throw new Error('Upload failed');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Upload failed');
+                }
             } catch (error) {
                 console.error(error);
-                alert('Failed to upload ' + file.name);
+                alert(`Failed to upload ${file.name}: ${error.message}`);
             }
         }
 

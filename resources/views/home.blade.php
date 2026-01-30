@@ -57,9 +57,7 @@
               @if($documentary->thumbnail)
                   <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="{{ $documentary->title }}" loading="lazy" style="border-radius: 8px;">
               @else
-                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 200px; border-radius: 8px; display: flex; align-items: center; justify-center; color: white; font-size: 48px;">
-                      🎬
-                  </div>
+                  <img src="{{ asset('images/default-thumb.jpg') }}" alt="{{ $documentary->title }}" loading="lazy" style="border-radius: 8px;">
               @endif
               <div class="news-content">
                   <small style="color: #667eea; font-weight: bold;">DOCUMENTARY</small>
