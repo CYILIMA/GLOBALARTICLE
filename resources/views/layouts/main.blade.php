@@ -19,13 +19,30 @@
     <nav class="desktop-nav">
       <ul>
         <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
-        <li><a href="{{ url('/?category=politics') }}" class="{{ request('category') == 'politics' ? 'active' : '' }}">POLITICS</a></li>
-        <li><a href="{{ url('/?category=technology') }}" class="{{ request('category') == 'technology' ? 'active' : '' }}">TECHNOLOGY</a></li>
-        <li><a href="{{ url('/?category=sports') }}" class="{{ request('category') == 'sports' ? 'active' : '' }}">SPORTS</a></li>
-        <li><a href="{{ url('/?category=entertainment') }}" class="{{ request('category') == 'entertainment' ? 'active' : '' }}">ENTERTAINMENT</a></li>
-        <li><a href="{{ url('/?category=economy') }}" class="{{ request('category') == 'economy' ? 'active' : '' }}">ECONOMY</a></li>
-        <li><a href="{{ url('/?category=health') }}" class="{{ request('category') == 'health' ? 'active' : '' }}">HEALTH</a></li>
-        <li><a href="{{ url('/?category=religion') }}" class="{{ request('category') == 'religion' ? 'active' : '' }}">RELIGION</a></li>
+        @if(isset($globalCategories))
+            @foreach($globalCategories->take(7) as $cat)
+                <li>
+                    <a href="{{ url('/?category=' . $cat->slug) }}" 
+                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
+                       {{ strtoupper($cat->name) }}
+                    </a>
+                </li>
+            @endforeach
+
+            @if($globalCategories->count() > 7)
+                <li class="nav-dropdown">
+                    <a href="#" style="cursor: default">MORE ▾</a>
+                    <div class="nav-dropdown-content">
+                        @foreach($globalCategories->skip(7) as $cat)
+                            <a href="{{ url('/?category=' . $cat->slug) }}"
+                               class="{{ request('category') == $cat->slug ? 'text-blue-600' : '' }}">
+                                {{ $cat->name }}
+                            </a>
+                        @endforeach
+                    </div>
+                </li>
+            @endif
+        @endif
       </ul>
     </nav>
 
@@ -43,13 +60,16 @@
       <div class="close-btn" onclick="toggleMenu()">✕</div>
       <ul>
         <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
-        <li><a href="{{ url('/?category=politics') }}" class="{{ request('category') == 'politics' ? 'active' : '' }}">POLITICS</a></li>
-        <li><a href="{{ url('/?category=technology') }}" class="{{ request('category') == 'technology' ? 'active' : '' }}">TECHNOLOGY</a></li>
-        <li><a href="{{ url('/?category=sports') }}" class="{{ request('category') == 'sports' ? 'active' : '' }}">SPORTS</a></li>
-        <li><a href="{{ url('/?category=entertainment') }}" class="{{ request('category') == 'entertainment' ? 'active' : '' }}">ENTERTAINMENT</a></li>
-        <li><a href="{{ url('/?category=economy') }}" class="{{ request('category') == 'economy' ? 'active' : '' }}">ECONOMY</a></li>
-        <li><a href="{{ url('/?category=health') }}" class="{{ request('category') == 'health' ? 'active' : '' }}">HEALTH</a></li>
-        <li><a href="{{ url('/?category=religion') }}" class="{{ request('category') == 'religion' ? 'active' : '' }}">RELIGION</a></li>
+        @if(isset($globalCategories))
+            @foreach($globalCategories as $cat)
+                <li>
+                    <a href="{{ url('/?category=' . $cat->slug) }}" 
+                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
+                       {{ strtoupper($cat->name) }}
+                    </a>
+                </li>
+            @endforeach
+        @endif
       </ul>
     </nav>
   </div>

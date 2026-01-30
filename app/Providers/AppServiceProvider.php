@@ -35,6 +35,11 @@ class AppServiceProvider extends ServiceProvider
                         ->get();
                     $view->with('globalBreakingNews', $breakingNews);
                 }
+
+                if (\Illuminate\Support\Facades\Schema::hasTable('categories')) {
+                    $categories = \App\Models\Category::all();
+                    $view->with('globalCategories', $categories);
+                }
             } catch (\Exception $e) {
                 // Ignore DB errors during setup
             }
