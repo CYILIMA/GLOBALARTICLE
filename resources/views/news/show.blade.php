@@ -30,7 +30,46 @@
 
     <!-- Content -->
     <div class="article-content">
-        {!! $news->content !!}
+        @if($news->content_version === 'v2' && $news->content_blocks)
+            {{-- Render block-based content --}}
+            @foreach($news->content_blocks['blocks'] ?? [] as $index => $block)
+                @if($block['type'] === 'paragraph')
+                    <p class="{{ $index === 0 ? 'article-intro' : '' }}">
+                        {!! $block['data']['text'] ?? '' !!}
+                    </p>
+                    
+                @elseif($block['type'] === 'header')
+                    @if($block['data']['level'] == 2)
+                        <h2 class="article-heading-2">{{ $block['data']['text'] ?? '' }}</h2>
+                    @elseif($block['data']['level'] == 3)
+                        <h3 class="article-heading-3">{{ $block['data']['text'] ?? '' }}</h3>
+                    @endif
+                    
+                @elseif($block['type'] === 'image')
+                    <figure class="article-figure">
+                        <img src="{{ $block['data']['file']['url'] ?? '' }}" 
+                             alt="{{ $block['data']['caption'] ?? '' }}" 
+                             class="article-figure-image">
+                        @if(!empty($block['data']['caption']))
+                            <figcaption class="article-figcaption">
+                                {{ $block['data']['caption'] }}
+                            </figcaption>
+                        @endif
+                    </figure>
+                    
+                @elseif($block['type'] === 'quote')
+                    <blockquote class="article-quote">
+                        <p>{{ $block['data']['text'] ?? '' }}</p>
+                        @if(!empty($block['data']['caption']))
+                            <cite>{{ $block['data']['caption'] }}</cite>
+                        @endif
+                    </blockquote>
+                @endif
+            @endforeach
+        @else
+            {{-- Render legacy HTML content --}}
+            {!! $news->content !!}
+        @endif
     </div>
 
     <!-- Comments Section -->

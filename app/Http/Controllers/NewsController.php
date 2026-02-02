@@ -2,41 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\News;
+use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = News::query();
+        $query = News::where('status', 'published')->latest();
 
-        // Filter by category if present in URL (?category=politics)
-        if ($request->has('category') && $request->category != 'all') {
+        // Filter by category if provided
+        if ($request->has('category')) {
             $query->where('category', $request->category);
         }
 
-        $news = $query->where('status', 'published')->latest()->get();
+        $news = $query->paginate(12);
 
-        // Get published documentaries for homepage
-        $documentaries = \App\Models\Documentary::published()->latest()->take(6)->get();
+        // Get latest news for sidebar
+        $sidebarLatest = News::where('status', 'published')
+            ->latest()
+            ->take(5)
+            ->get();
 
-        // Get latest news for sidebar (always show top 5 regardless of category filter)
-        $sidebarLatest = News::where('status', 'published')->latest()->take(5)->get();
+        // Get documentaries
+        $documentaries = \App\Models\Documentary::where('status', 'published')
+            ->latest()
+            ->take(6)
+            ->get();
 
-        return view('home', [
-            'news' => $news,
-            'category' => $request->category,
-            'documentaries' => $documentaries,
-            'sidebarLatest' => $sidebarLatest,
-        ]);
+        $category = $request->category ?? null;
+
+        return view('home', compact('news', 'sidebarLatest', 'documentaries', 'category'));
     }
 
     public function show(News $news)
     {
-        if ($news->status !== 'published' && !auth()->check()) {
-            abort(404);
-        }
+        // Increment views
+        $news->increment('views');
 
         $relatedNews = News::where('category_id', $news->category_id)
             ->where('id', '!=', $news->id)
@@ -58,8 +60,10 @@ class NewsController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category_id' => 'required|exists:categories,id', // Validating real category
+            'content' => 'nullable|string', // Optional for v2 (blocks)
+            'content_blocks' => 'nullable|json', // New block-based content
+            'content_version' => 'nullable|in:v1,v2',
+            'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
@@ -82,9 +86,12 @@ class NewsController extends Controller
             $expiresAt = now()->addHours(24);
         }
 
+
         $news = News::create([
             'title' => $request->title,
-            'content' => $request->content,
+            'content' => $request->content ?? '', // Fallback for v2 blocks
+            'content_blocks' => json_decode($request->content_blocks, true),
+            'content_version' => $request->content_version ?? 'v1',
             'category_id' => $request->category_id,
             'category' => $category->name, // Keeping legacy string for backward compatibility
             'image' => $imagePath,
@@ -95,6 +102,7 @@ class NewsController extends Controller
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
         ]);
+
 
         // Trigger Breaking News Emails
         if ($news->breaking && $news->status == 'published') {
@@ -108,12 +116,7 @@ class NewsController extends Controller
             }
         }
 
-        // Create notification for admin
-        if ($news->status == 'published') {
-            \App\Services\NotificationService::articlePublished(auth()->id(), $news);
-        }
-
-        return redirect()->route('dashboard')->with('success', 'News article created successfully!');
+        return redirect()->route('admin.news.index')->with('success', 'News article created successfully!');
     }
 
     public function edit(News $news)
@@ -139,27 +142,28 @@ class NewsController extends Controller
 
         $imagePath = $news->image;
         if ($request->hasFile('image')) {
-            // Delete old image? For now, we keep it to avoid broken links if used elsewhere, 
-            // or we could use Storage::delete($news->image) if we want to be clean.
+            // Delete old image
+            if ($news->image) {
+                \Storage::disk('public')->delete($news->image);
+            }
             $imagePath = $request->file('image')->store('news_images', 'public');
         }
 
         $category = \App\Models\Category::find($request->category_id);
 
+        // Default expiration to 24h if breaking is checked but no date provided
         $expiresAt = $request->breaking_expires_at;
-        if ($request->has('breaking') && !$expiresAt && !$news->breaking_expires_at) {
-             // If turning on breaking and no date set, default to 24h from now
-             $expiresAt = now()->addHours(24);
-        } elseif ($request->has('breaking') && !$expiresAt && $news->breaking_expires_at) {
-             // Keep existing if invalid
-             $expiresAt = $news->breaking_expires_at;
+        if ($request->has('breaking') && !$expiresAt) {
+            $expiresAt = now()->addHours(24);
         }
 
         $news->update([
             'title' => $request->title,
             'content' => $request->content,
+            'content_blocks' => json_decode($request->content_blocks, true),
+            'content_version' => $request->content_version ?? $news->content_version,
             'category_id' => $request->category_id,
-            'category' => $category->name, // Sync legacy column
+            'category' => $category->name,
             'image' => $imagePath,
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
@@ -174,7 +178,36 @@ class NewsController extends Controller
 
     public function destroy(News $news)
     {
+        if ($news->image) {
+            \Storage::disk('public')->delete($news->image);
+        }
         $news->delete();
-        return redirect()->route('admin.news.index')->with('success', 'Article deleted successfully.');
+        return redirect()->route('admin.news.index')->with('success', 'News article deleted successfully!');
+    }
+    
+    /**
+     * Upload article image for Editor.js
+     */
+    public function uploadArticleImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+        
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('article_images', 'public');
+            
+            return response()->json([
+                'success' => 1,
+                'file' => [
+                    'url' => asset('storage/' . $path)
+                ]
+            ]);
+        }
+        
+        return response()->json([
+            'success' => 0,
+            'message' => 'No image uploaded'
+        ], 400);
     }
 }

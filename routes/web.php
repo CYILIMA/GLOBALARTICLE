@@ -65,6 +65,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'store' => 'admin.media.store',
         'destroy' => 'admin.media.destroy',
     ]);
+    
+    // Article Image Upload (for Editor.js)
+    Route::post('/admin/upload-article-image', [NewsController::class, 'uploadArticleImage'])->name('admin.upload-article-image');
+
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('admin.notifications.index');

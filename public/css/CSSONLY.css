@@ -801,7 +801,7 @@ footer {
 
 /* Article Page Styles */
 .article-container {
-  max-width: 900px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 20px 20px 40px 20px;
   position: relative;
@@ -930,6 +930,91 @@ footer {
 .article-content li {
   margin-bottom: 10px;
 }
+
+/* Block-Based Content Styles */
+.article-intro {
+  font-size: 22px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 30px;
+  border-left: 4px solid var(--accent-color);
+  padding-left: 20px;
+}
+
+.article-figure {
+  margin: 40px 0;
+  max-width: 100%;
+}
+
+.article-figure-image {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  background-color: var(--bg-card);
+}
+
+.article-figcaption {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.article-quote {
+  margin: 40px 0;
+  padding: 30px;
+  background: var(--bg-card);
+  border-left: 5px solid var(--accent-color);
+  border-radius: 8px;
+  font-size: 20px;
+  line-height: 1.7;
+  font-style: italic;
+  color: var(--text-main);
+}
+
+.article-quote p {
+  margin: 0;
+}
+
+.article-quote cite {
+  display: block;
+  margin-top: 15px;
+  font-size: 16px;
+  font-style: normal;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.article-quote cite::before {
+  content: "— ";
+}
+
+.article-heading-2 {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.article-heading-3 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 600;
+  margin-top: 40px;
+  margin-bottom: 15px;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
 
 .article-section {
   background: var(--bg-card);

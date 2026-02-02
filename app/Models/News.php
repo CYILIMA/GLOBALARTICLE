@@ -12,6 +12,8 @@ class News extends Model
     protected $fillable = [
         'title',
         'content',
+        'content_blocks', // JSON block data
+        'content_version', // v1=HTML, v2=blocks
         'category', // Legacy string
         'category_id', // New relation
         'image',
@@ -30,6 +32,7 @@ class News extends Model
         'published_at' => 'datetime',
         'scheduled_at' => 'datetime',
         'breaking_expires_at' => 'datetime',
+        'content_blocks' => 'array', // Cast JSON to array
     ];
 
     public function categoryData()

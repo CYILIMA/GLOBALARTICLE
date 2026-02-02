@@ -1,9 +1,13 @@
 <x-admin-layout>
     @section('header', 'New Article')
 
-    <div class="max-w-4xl mx-auto space-y-6" x-data>
-        <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data">
+    <div class="max-w-4xl mx-auto space-y-6">
+        <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" id="articleForm">
             @csrf
+            
+            <!-- Hidden field for block content -->
+            <input type="hidden" name="content_blocks" id="content_blocks">
+            <input type="hidden" name="content_version" value="v2">
 
             <!-- MAIN CONTENT -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6">
@@ -43,25 +47,18 @@
                     </div>
                 </div>
 
-                <!-- Content -->
-                <div x-data="richEditor('')">
-                    <div class="flex justify-between items-center mb-2">
-                        <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Article Content</label>
-                        <button type="button" @click="$dispatch('open-media-modal')" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md transition flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            Insert from Media Library
-                        </button>
-                    </div>
-                    <div class="prose dark:prose-invert max-w-none">
-                        <textarea x-ref="input" name="content" id="content" class="hidden"></textarea>
-                        <div x-ref="editor"></div>
-                    </div>
+                <!-- Block Editor -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Article Content</label>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        Use the block editor below to structure your article. The first paragraph will automatically be styled as an introduction.
+                    </p>
+                    <div id="editorjs" style="border: 2px solid #e5e7eb; border-radius: 8px; min-height: 400px; background: white;" class="dark:bg-gray-900 dark:border-gray-700"></div>
                 </div>
             </div>
 
             <!-- SIDEBAR SETTINGS -->
             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
-                <!-- ... (Sidebar settings content remains same, just ensuring context match) -->
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 border-b pb-2 dark:border-gray-700">Publishing Settings</h3>
 
                 <!-- Featured Image -->
@@ -69,7 +66,7 @@
                     <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Featured Image</label>
                     <input type="file" name="image" id="image" accept="image/*" 
                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300">
-                    <p class="text-xs text-gray-500 mt-1">Recommended size: 1200x630px</p>
+                    <p class="text-xs text-gray-500 mt-1">Recommended size: 1200x630px. This is separate from inline article images.</p>
                 </div>
 
                 <!-- SEO -->
@@ -103,12 +100,10 @@
                         <label for="breaking_expires_at" class="block text-xs font-medium text-red-800 dark:text-red-400 mb-1">Expires At (Optional)</label>
                         <input type="datetime-local" name="breaking_expires_at" id="breaking_expires_at" 
                                class="w-full border-red-200 dark:border-red-800/50 dark:bg-gray-900 rounded shadow-sm text-sm text-gray-700 dark:text-gray-300 focus:ring-red-500 focus:border-red-500">
-                        <p class="text-xs text-gray-400 mt-1">Leaves empty to default to 24 hours.</p>
+                        <p class="text-xs text-gray-400 mt-1">Leave empty to default to 24 hours.</p>
                     </div>
                 </div>
             </div>
-            
-            <x-media-library-modal />
 
             <!-- ACTIONS -->
             <div class="flex items-center justify-end gap-4 border-t pt-6 dark:border-gray-700">
@@ -120,15 +115,176 @@
 
         </form>
     </div>
-</x-admin-layout>
+    @push('scripts')
+    <!-- Editor.js Core and Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.28.2?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.7.0?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.8.1?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.5.0?v={{ time() }}"></script>
 
-@push('scripts')
+    <!-- Article Editor Initialization -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let editor; // Declare globally within this scope
+
+    try {
+        // Initialize Editor.js
+        editor = new EditorJS({ // Assign to outer variable
+            holder: 'editorjs',
+            
+            // Start with an empty paragraph block
+            data: {
+                blocks: [
+                    {
+                        type: 'paragraph',
+                        data: {
+                            text: ''
+                        }
+                    }
+                ]
+            },
+            
+            autofocus: true,
+            
+            tools: {
+                header: {
+                    class: Header,
+                    config: {
+                        placeholder: 'Enter a heading',
+                        levels: [2, 3],
+                        defaultLevel: 2
+                    }
+                },
+                
+                image: {
+                    class: ImageTool,
+                    config: {
+                        endpoints: {
+                            byFile: '/admin/upload-article-image',
+                        },
+                        field: 'image',
+                        types: 'image/*',
+                        captionPlaceholder: 'Enter image caption (required)',
+                        buttonContent: 'Select an image',
+                        additionalRequestHeaders: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }
+                },
+                
+                quote: {
+                    class: Quote,
+                    inlineToolbar: true,
+                    config: {
+                        quotePlaceholder: 'Enter a quote',
+                        captionPlaceholder: 'Quote author (optional)'
+                    }
+                }
+            },
+            
+            placeholder: 'Start writing your article...',
+            minHeight: 300,
+            
+            placeholder: 'Start writing your article...',
+            minHeight: 300,
+        });
+    } catch (error) {
+        console.error('Error initializing Editor.js:', error);
+        alert('Error loading editor: ' + error.message);
+    }
+    
+    // Handle form submission
+    document.getElementById('articleForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!editor) {
+            alert('Editor not initialized properly');
+            return;
+        }
+
+        try {
+            // Save editor content
+            const outputData = await editor.save();
+            
+            // Validate that all images have captions
+            const imageBlocks = outputData.blocks.filter(block => block.type === 'image');
+            for (let img of imageBlocks) {
+                if (!img.data.caption || img.data.caption.trim() === '') {
+                    alert('All images must have captions');
+                    return;
+                }
+            }
+            
+            // Mark first paragraph as intro
+            if (outputData.blocks.length > 0 && outputData.blocks[0].type === 'paragraph') {
+                outputData.blocks[0].data.isIntro = true;
+            }
+            
+            // Set the hidden field value
+            document.getElementById('content_blocks').value = JSON.stringify(outputData);
+            
+            // Submit the form
+            this.submit();
+        } catch (error) {
+            alert('Error saving article: ' + error.message);
+            console.error('Save error:', error);
+        }
+    });
+});
+</script>
+
 <style>
-    /* ... existing styles ... */
-    .ck-editor__editable_inline { min-height: 400px; }
-    .dark .ck-editor__editable { background-color: #1f2937 !important; color: #f3f4f6 !important; }
-    .dark .ck.ck-toolbar, .dark .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused) { background-color: #1f2937; border-color: #374151; }
-    .dark .ck.ck-toolbar__items { background-color: #1f2937; }
-    .dark .ck.ck-button { color: #f3f4f6; }
-    .dark .ck.ck-button:hover { background-color: #374151; }
+/* Editor.js Custom Styling */
+#editorjs {
+    padding: 20px;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.codex-editor__redactor {
+    padding-bottom: 100px !important;
+}
+
+.ce-paragraph {
+    line-height: 1.7;
+    font-size: 18px;
+}
+
+/* Dark mode support */
+.dark #editorjs {
+    color: #f3f4f6;
+}
+
+.dark .ce-block__content {
+    color: #f3f4f6;
+}
+
+.dark .ce-toolbar__plus,
+.dark .ce-toolbar__settings-btn {
+    color: #f3f4f6;
+}
+
+.dark .ce-inline-toolbar,
+.dark .ce-conversion-toolbar,
+.dark .ce-settings {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.dark .ce-inline-tool,
+.dark .ce-conversion-tool,
+.dark .ce-settings__button {
+    color: #f3f4f6;
+}
+
+.dark .ce-inline-tool:hover,
+.dark .ce-settings__button:hover {
+    background-color: #374151;
+}
 </style>
+@endpush
+</x-admin-layout>
