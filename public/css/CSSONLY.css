@@ -68,7 +68,7 @@ a {
 }
 
 /* HEADER */
-header {
+body>header {
   background: var(--header-bg);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
