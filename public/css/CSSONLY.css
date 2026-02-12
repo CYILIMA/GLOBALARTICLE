@@ -1233,6 +1233,7 @@ footer {
     grid-template-columns: 1fr;
   }
 
+
   .related-grid {
     grid-template-columns: 1fr;
   }
@@ -1240,4 +1241,67 @@ footer {
   .article-section {
     padding: 20px;
   }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Header utilities */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 20px;
+}
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  padding: 5px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.2);
+}
+
+.nav-dropdown-trigger {
+  cursor: default;
+}
+
+/* Footer utilities */
+.footer-logo {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.footer-description {
+  color: #aaa;
+  margin-bottom: 20px;
+}
+
+/* Success/Error banners */
+.success-banner {
+  background: green;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  width: 100%;
+}
+
+/* Common utilities */
+.text-center {
+  text-align: center;
+}
+
+.hidden {
+  display: none;
 }
