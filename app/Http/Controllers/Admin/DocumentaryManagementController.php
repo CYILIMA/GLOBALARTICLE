@@ -44,6 +44,7 @@ class DocumentaryManagementController extends Controller
         }
 
         $documentary = Documentary::create([
+            'user_id' => auth()->id(),
             'title' => $request->title,
             'description' => $request->description,
             'content' => $request->content,
