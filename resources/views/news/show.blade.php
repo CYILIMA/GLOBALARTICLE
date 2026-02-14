@@ -5,21 +5,24 @@
 
 @section('content')
 <article class="article-container">
-    <!-- Header -->
     <header class="article-header">
+        <h1 class="article-title">
+            {{ $news->title }}
+        </h1>
+
         <div class="article-meta">
             <a href="{{ route('home', ['category' => $news->category]) }}" class="article-category-link">
                 {{ $news->category }}
             </a>
             <span class="article-meta-separator">&bull;</span>
+            <span class="article-meta-author">
+                By {{ $news->author->name ?? 'Global Articles Editor' }}
+            </span>
+            <span class="article-meta-separator">&bull;</span>
             <time datetime="{{ $news->published_at ?? $news->created_at }}" class="article-meta-time">
-                {{ ($news->published_at ?? $news->created_at)->format('F d, Y') }}
+                {{ ($news->published_at ?? $news->created_at)->format('F d, Y • h:i A') }}
             </time>
         </div>
-
-        <h1 class="article-title">
-            {{ $news->title }}
-        </h1>
 
         @if($news->image)
             <figure class="article-image-container">
@@ -142,4 +145,6 @@
     @endif
 
 </article>
+
+@include('partials.sidebar')
 @endsection

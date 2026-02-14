@@ -9,7 +9,7 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = News::where('status', 'published')->latest();
+        $query = News::with(['categoryData', 'author'])->where('status', 'published')->latest();
 
         // Filter by category if provided
         if ($request->has('category')) {
@@ -47,13 +47,20 @@ class NewsController extends Controller
             ->take(3)
             ->get();
 
-        return view('news.show', compact('news', 'relatedNews'));
+        // Get latest news for sidebar
+        $sidebarLatest = News::where('status', 'published')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('news.show', compact('news', 'relatedNews', 'sidebarLatest'));
     }
 
     public function create()
     {
         $categories = \App\Models\Category::all();
-        return view('admin.news.create', compact('categories'));
+        $authors = \App\Models\User::whereIn('role', ['admin', 'editor', 'author'])->get();
+        return view('admin.news.create', compact('categories', 'authors'));
     }
 
     public function store(Request $request)
@@ -64,7 +71,7 @@ class NewsController extends Controller
             'content_blocks' => 'nullable|json', // New block-based content
             'content_version' => 'nullable|in:v1,v2',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
             'published_at' => 'nullable|date',
@@ -94,6 +101,7 @@ class NewsController extends Controller
             'content_version' => $request->content_version ?? 'v1',
             'category_id' => $request->category_id,
             'category' => $category->name, // Keeping legacy string for backward compatibility
+            'user_id' => $request->user_id ?? auth()->id(), // Set requested user or current user
             'image' => $imagePath,
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
@@ -116,22 +124,30 @@ class NewsController extends Controller
             }
         }
 
-        return redirect()->route('admin.news.index')->with('success', 'News article created successfully!');
+        $message = auth()->user()->role === 'author' 
+            ? 'Article submitted successfully and is awaiting administrator approval.' 
+            : 'News article created successfully!';
+
+        return redirect()->route('admin.news.index')->with('success', $message);
     }
 
     public function edit(News $news)
     {
+        $this->authorize('update', $news);
         $categories = \App\Models\Category::all();
-        return view('admin.news.edit', compact('news', 'categories'));
+        $authors = \App\Models\User::whereIn('role', ['admin', 'editor', 'author'])->get();
+        return view('admin.news.edit', compact('news', 'categories', 'authors'));
     }
 
     public function update(Request $request, News $news)
     {
+        $this->authorize('update', $news);
+        
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
             'published_at' => 'nullable|date',
@@ -159,11 +175,12 @@ class NewsController extends Controller
 
         $news->update([
             'title' => $request->title,
-            'content' => $request->content,
+            'content' => $request->content ?? '', // Fallback for v2 blocks
             'content_blocks' => json_decode($request->content_blocks, true),
             'content_version' => $request->content_version ?? $news->content_version,
             'category_id' => $request->category_id,
             'category' => $category->name,
+            'user_id' => $request->user_id ?? ($news->user_id ?? auth()->id()), // Maintain, change, or set author
             'image' => $imagePath,
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
@@ -173,11 +190,17 @@ class NewsController extends Controller
             'meta_description' => $request->meta_description,
         ]);
 
-        return redirect()->route('admin.news.index')->with('success', 'News article updated successfully!');
+        $message = auth()->user()->role === 'author' && $news->status !== 'published'
+            ? 'Article updated and remains in review/draft status.' 
+            : 'News article updated successfully!';
+
+        return redirect()->route('admin.news.index')->with('success', $message);
     }
 
     public function destroy(News $news)
     {
+        $this->authorize('delete', $news);
+
         if ($news->image) {
             \Storage::disk('public')->delete($news->image);
         }
@@ -191,7 +214,7 @@ class NewsController extends Controller
     public function uploadArticleImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480'
         ]);
         
         if ($request->hasFile('image')) {

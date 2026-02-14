@@ -19,7 +19,9 @@
                 <a href="{{ route('home', ['category' => $item->category]) }}" class="category-link"><small>{{ $item->category }}</small></a>
                 <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                 <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
-                <div style="margin-top: 10px; font-size: 13px; color: #555;">{{ $item->created_at->diffForHumans() }}</div>
+                <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                    By {{ $item->author->name ?? 'Global Articles Editor' }} &bull; {{ $item->created_at->diffForHumans() }}
+                </div>
             </div>
         </div>
       @empty
@@ -31,21 +33,7 @@
   </section>
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h3>Recent Headlines</h3>
-    <ul id="latestNews">
-        @forelse($sidebarLatest ?? [] as $latest)
-            <li>
-                <a href="{{ route('news.show', $latest) }}">
-                    <span class="headline-title">{{ Str::limit($latest->title, 70) }}</span>
-                    <span class="headline-time">{{ $latest->created_at->diffForHumans() }}</span>
-                </a>
-            </li>
-        @empty
-             <li style="color: var(--text-muted); font-style: italic; padding: 10px 0;">No latest articles found.</li>
-        @endforelse
-    </ul>
-  </aside>
+  @include('partials.sidebar')
 
   <!-- DOCUMENTARY SECTION -->
   @if($documentaries->count() > 0)

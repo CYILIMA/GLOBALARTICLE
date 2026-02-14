@@ -1,10 +1,10 @@
 <x-admin-layout>
     @section('header', 'Manage Articles')
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+    <div class="rounded-lg shadow-sm overflow-hidden border transition-colors" style="background: var(--sidebar-bg); border-color: var(--border-color)">
         
         <!-- Toolbar -->
-        <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-4" style="background: var(--sidebar-hover); border-color: var(--border-color)">
             <div class="flex gap-2">
                 <a href="{{ route('dashboard', ['status' => 'all']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'all' || !request('status') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">All</a>
                 <a href="{{ route('dashboard', ['status' => 'published']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Published</a>
@@ -24,14 +24,15 @@
                 <tr>
                     <th class="px-6 py-3">Title</th>
                     <th class="px-6 py-3">Category</th>
+                    <th class="px-6 py-3">Author</th>
                     <th class="px-6 py-3">Status</th>
                     <th class="px-6 py-3">Published</th>
                     <th class="px-6 py-3 text-right">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody class="divide-y" style="border-color: var(--border-color)">
                 @foreach($latestArticles as $article)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <tr class="transition-colors hover:opacity-80" style="background: transparent; border-color: var(--border-color)">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             @if($article->image)
@@ -40,7 +41,7 @@
                                 <div class="w-10 h-10 rounded bg-gray-200 dark:bg-gray-600"></div>
                             @endif
                             <div>
-                                <span class="font-medium text-gray-900 dark:text-gray-100 block">{{ Str::limit($article->title, 40) }}</span>
+                                <span class="font-medium block" style="color: var(--text-main)">{{ Str::limit($article->title, 40) }}</span>
                                 @if($article->breaking)
                                     <span class="text-xs text-red-500 font-bold uppercase tracking-wider">Breaking</span>
                                 @endif
@@ -56,21 +57,13 @@
                             <span class="text-xs text-gray-500">{{ $article->category }}</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
-                         @php
-                            $statusClasses = match($article->status) {
-                                'published' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                                'draft' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                'scheduled' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-                                'archived' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-                                default => 'bg-gray-100 text-gray-800'
-                            };
-                        @endphp
-                        <span class="px-2 py-1 rounded text-xs font-semibold {{ $statusClasses }}">
-                            {{ ucfirst($article->status ?? 'Draft') }}
-                        </span>
+                    <td class="px-6 py-4 text-sm" style="color: var(--text-sidebar)">
+                        {{ $article->author->name ?? 'System' }}
                     </td>
-                    <td class="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
+                    <td class="px-6 py-4">
+                        <x-status-badge :status="$article->status" />
+                    </td>
+                    <td class="px-6 py-4 text-xs" style="color: var(--text-sidebar)">
                         {{ $article->published_at ? $article->published_at->format('M d, Y H:i') : '-' }}
                     </td>
                     <td class="px-6 py-4 text-right">

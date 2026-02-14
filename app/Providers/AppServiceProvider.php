@@ -49,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\View::composer('home', function ($view) {
              try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('news')) {
-                    $sidebarLatest = \App\Models\News::latest()->take(5)->get();
+                    $sidebarLatest = \App\Models\News::where('status', 'published')->latest()->take(5)->get();
                     $view->with('sidebarLatest', $sidebarLatest);
                 }
             } catch (\Exception $e) {

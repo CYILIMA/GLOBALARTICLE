@@ -2,6 +2,17 @@
     @section('header', 'New Article')
 
     <div class="max-w-4xl mx-auto space-y-6">
+        @if ($errors->any())
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm dark:bg-red-900/50 dark:text-red-200" role="alert">
+                <p class="font-bold mb-1">Please fix the following errors:</p>
+                <ul class="list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" id="articleForm">
             @csrf
             
@@ -20,30 +31,47 @@
                            placeholder="Enter a catchy title...">
                 </div>
 
-                <!-- Category & Status -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Category, Status, & Author -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                         <select name="category_id" id="category_id" required 
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
                             <option value="">Select a Category...</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
                         </select>
-                        @if($categories->isEmpty())
-                            <p class="text-xs text-red-500 mt-1">No categories found. Please create one first.</p>
-                        @endif
                     </div>
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                         <select name="status" id="status" required 
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
-                            <option value="draft">Draft (Save for later)</option>
-                            <option value="published">Published (Visible immediately)</option>
-                            <option value="scheduled">Scheduled</option>
-                            <option value="archived">Archived</option>
+                            <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
+                            @if(auth()->user()->role !== 'author')
+                                <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published (Visible immediately)</option>
+                                <option value="scheduled" {{ old('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                            @endif
+                            <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
+                        @if(auth()->user()->role === 'author')
+                            <p class="text-[10px] text-orange-500 mt-1 uppercase font-bold tracking-tighter">Requires Administrator Approval to Publish</p>
+                        @endif
+                    </div>
+                    <div>
+                        <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Author</label>
+                        <select name="user_id" id="user_id" required 
+                                {{ auth()->user()->role === 'author' ? 'disabled' : '' }}
+                                class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white {{ auth()->user()->role === 'author' ? 'bg-gray-50 opacity-75' : '' }}">
+                            @foreach($authors as $author)
+                                <option value="{{ $author->id }}" {{ (old('user_id', auth()->id()) == $author->id) ? 'selected' : '' }}>
+                                    {{ $author->name }} ({{ ucfirst($author->role) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @if(auth()->user()->role === 'author')
+                            <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                        @endif
                     </div>
                 </div>
 
@@ -53,7 +81,7 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
                         Use the block editor below to structure your article. The first paragraph will automatically be styled as an introduction.
                     </p>
-                    <div id="editorjs" style="border: 2px solid #e5e7eb; border-radius: 8px; min-height: 400px; background: white;" class="dark:bg-gray-900 dark:border-gray-700"></div>
+                    <div id="editorjs" style="min-height: 400px;" class="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner"></div>
                 </div>
             </div>
 
@@ -61,27 +89,19 @@
             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 border-b pb-2 dark:border-gray-700">Publishing Settings</h3>
 
-                <!-- Featured Image -->
+                <!-- Article Thumbnail -->
                 <div>
-                    <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Featured Image</label>
-                    <input type="file" name="image" id="image" accept="image/*" 
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300">
-                    <p class="text-xs text-gray-500 mt-1">Recommended size: 1200x630px. This is separate from inline article images.</p>
+                    <label for="image" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Article Thumbnail</label>
+                    <div class="relative group">
+                        <input type="file" name="image" id="image" accept="image/*" 
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300 cursor-pointer">
+                    </div>
+                    <div class="mt-2 flex flex-col gap-1">
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Recommended: 1200x630px (Landscape)</p>
+                        <p class="text-[10px] text-orange-500/80 dark:text-orange-400/80 font-bold italic">Max size: 20MB. For larger images, please compress before uploading.</p>
+                    </div>
                 </div>
 
-                <!-- SEO -->
-                <div class="space-y-4">
-                    <div>
-                        <label for="meta_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SEO Title (Optional)</label>
-                        <input type="text" name="meta_title" id="meta_title" 
-                               class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded shadow-sm text-sm dark:text-white">
-                    </div>
-                    <div>
-                        <label for="meta_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SEO Description (Optional)</label>
-                        <textarea name="meta_description" id="meta_description" rows="3" 
-                                  class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded shadow-sm text-sm dark:text-white"></textarea>
-                    </div>
-                </div>
 
                 <!-- Breaking News -->
                 <div class="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50 flex-col">
@@ -105,16 +125,35 @@
                 </div>
             </div>
 
-            <!-- ACTIONS -->
             <div class="flex items-center justify-end gap-4 border-t pt-6 dark:border-gray-700">
                 <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">Cancel</a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
-                    Save Article
+                <button type="submit" class="font-bold py-3 px-10 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
+                        style="background: var(--primary); color: #fff;">
+                    {{ auth()->user()->role === 'author' ? 'Publish Article' : 'Save Article' }}
                 </button>
             </div>
 
         </form>
     </div>
+
+    <style>
+        /* Editor.js Dark Mode Overrides */
+        .dark .ce-block { color: #e5e7eb; }
+        .dark .ce-paragraph { color: #e5e7eb; }
+        .dark .ce-header { color: #f3f4f6; }
+        .dark .ce-toolbar__actions { background-color: #1f2937; border-radius: 4px; }
+        .dark .ce-toolbar__plus, .dark .ce-toolbar__settings-btn { color: #9ca3af; background-color: #374151; }
+        .dark .ce-toolbar__plus:hover, .dark .ce-toolbar__settings-btn:hover { color: white; background-color: #4b5563; }
+        .dark .ce-popover { background: #1f2937; border: 1px solid #374151; color: #e5e7eb; }
+        .dark .ce-popover__item-icon { background: #374151; color: #e5e7eb; }
+        .dark .ce-popover__item:hover { background: #374151; }
+        .dark .ce-inline-toolbar { background: #1f2937; border: 1px solid #374151; color: #e5e7eb; }
+        .dark .ce-inline-tool:hover { background: #374151; }
+        .dark .cdx-input { background: #111827; border: 1px solid #374151; color: #e5e7eb; }
+        /* Placeholder color */
+        .dark .ce-paragraph[data-placeholder]:empty::before { color: #6b7280; }
+        .dark .ce-header[data-placeholder]:empty::before { color: #6b7280; }
+    </style>
     @push('scripts')
     <!-- Editor.js Core and Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.28.2?v={{ time() }}"></script>
@@ -132,8 +171,8 @@
         editor = new EditorJS({ // Assign to outer variable
             holder: 'editorjs',
             
-            // Start with an empty paragraph block
-            data: {
+            // Load old content if validation failed, otherwise start empty
+            data: @if(old('content_blocks')) {!! old('content_blocks') !!} @else {
                 blocks: [
                     {
                         type: 'paragraph',
@@ -142,7 +181,7 @@
                         }
                     }
                 ]
-            },
+            } @endif,
             
             autofocus: true,
             
@@ -181,9 +220,6 @@
                     }
                 }
             },
-            
-            placeholder: 'Start writing your article...',
-            minHeight: 300,
             
             placeholder: 'Start writing your article...',
             minHeight: 300,

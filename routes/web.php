@@ -12,6 +12,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentModerationController;
 use App\Http\Controllers\DocumentaryController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\DocumentaryManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,12 +59,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'destroy' => 'admin.categories.destroy',
     ]);
 
-    // Media Library
-    Route::post('/media/folder', [MediaController::class, 'createFolder'])->name('admin.media.folder.create');
-    Route::resource('/media', MediaController::class)->names([
-        'index' => 'admin.media.index',
-        'store' => 'admin.media.store',
-        'destroy' => 'admin.media.destroy',
+    // User Management (Admins/Authors)
+    Route::resource('/users', UserController::class)->names([
+        'index' => 'admin.users.index',
+        'create' => 'admin.users.create',
+        'store' => 'admin.users.store',
+        'edit' => 'admin.users.edit',
+        'update' => 'admin.users.update',
+        'destroy' => 'admin.users.destroy',
     ]);
     
     // Article Image Upload (for Editor.js)
@@ -105,6 +108,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'update' => 'admin.documentaries.update',
         'destroy' => 'admin.documentaries.destroy',
     ]);
+
+    // Media Library
+    Route::get('/media', [MediaController::class, 'index'])->name('admin.media.index');
+    Route::post('/media/upload', [MediaController::class, 'store'])->name('admin.media.store');
+    Route::delete('/media/{id}', [MediaController::class, 'destroy'])->name('admin.media.destroy');
+    Route::post('/media/folder', [MediaController::class, 'createFolder'])->name('admin.media.folder.create');
 });
 
 Route::middleware('auth')->group(function () {

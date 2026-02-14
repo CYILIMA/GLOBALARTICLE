@@ -4,45 +4,47 @@
     <!-- STATS ROW -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Total Articles -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md transition">
-            <div class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Total Articles</div>
-            <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $totalNews }}</div>
+        <div class="p-6 rounded-lg shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color); border-left-color: #3b82f6;">
+            <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-sidebar)">Total Articles</div>
+            <div class="mt-2 text-3xl font-bold" style="color: var(--text-main)">{{ $totalNews }}</div>
             <div class="mt-1 text-xs text-green-600 dark:text-green-400 flex items-center">
                 <span class="mr-1">↑</span> {{ $publishedCount }} Published
             </div>
         </div>
 
+        @if(auth()->user()->role === 'admin')
         <!-- Total Subscribers -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-green-500 hover:shadow-md transition">
-            <div class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Total Subscribers</div>
-            <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $totalSubscribers }}</div>
+        <div class="p-6 rounded-lg shadow-sm border-l-4 border-green-500 hover:shadow-md transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color); border-left-color: #10b981;">
+            <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-sidebar)">Total Subscribers</div>
+            <div class="mt-2 text-3xl font-bold" style="color: var(--text-main)">{{ $totalSubscribers }}</div>
         </div>
+        @endif
 
         <!-- Breaking News -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-red-500 hover:shadow-md transition">
-            <div class="text-gray-500 dark:text-gray-400 text-sm font-medium uppercase">Breaking News</div>
-            <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $breakingCount }}</div>
+        <div class="p-6 rounded-lg shadow-sm border-l-4 border-red-500 hover:shadow-md transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color); border-left-color: #ef4444;">
+            <div class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-sidebar)">Breaking News</div>
+            <div class="mt-2 text-3xl font-bold" style="color: var(--text-main)">{{ $breakingCount }}</div>
             <div class="text-xs text-red-500 mt-1">Currently Active</div>
         </div>
     </div>
 
     <!-- CONTENT INSIGHTS -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center justify-between">
+        <div class="p-4 rounded-lg shadow-sm flex items-center justify-between border transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color)">
             <div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Drafts</div>
-                <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $draftsCount }}</div>
+                <div class="text-xs uppercase font-bold" style="color: var(--text-sidebar)">Drafts</div>
+                <div class="text-2xl font-bold" style="color: var(--text-main)">{{ $draftsCount }}</div>
             </div>
-            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded text-gray-500 dark:text-gray-300">
+            <div class="p-2 rounded" style="background: var(--sidebar-hover); color: var(--text-sidebar)">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </div>
         </div>
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center justify-between">
+        <div class="p-4 rounded-lg shadow-sm flex items-center justify-between border transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color)">
             <div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">Scheduled</div>
-                <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $scheduledCount }}</div>
+                <div class="text-xs uppercase font-bold" style="color: var(--text-sidebar)">Scheduled</div>
+                <div class="text-2xl font-bold" style="color: var(--text-main)">{{ $scheduledCount }}</div>
             </div>
-            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-yellow-600 dark:text-yellow-300">
+            <div class="p-2 rounded bg-yellow-100/20 text-yellow-600 dark:text-yellow-400">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
         </div>
@@ -50,48 +52,39 @@
 
     <!-- QUICK ACTIONS -->
     <div class="flex flex-wrap gap-4 mb-8">
-        <a href="{{ route('news.create') }}" class="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-blue-400 dark:border-gray-600 font-bold py-3 px-6 rounded shadow flex items-center gap-2 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <a href="{{ route('news.create') }}" class="font-bold py-3 px-6 rounded shadow flex items-center gap-2 border transition-all hover:opacity-80" style="background: var(--sidebar-bg); color: var(--text-main); border-color: var(--border-color);">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--text-sidebar)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
             Write New Article
         </a>
-        <a href="{{ route('admin.subscribers') }}" class="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 font-bold py-3 px-6 rounded shadow flex items-center gap-2 transition">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        @if(auth()->user()->role === 'admin')
+        <a href="{{ route('admin.subscribers') }}" class="font-bold py-3 px-6 rounded shadow flex items-center gap-2 border transition-all hover:opacity-80" style="background: var(--sidebar-bg); color: var(--text-main); border-color: var(--border-color);">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" style="color: var(--text-sidebar)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             Manage Subscribers
         </a>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- LATEST ARTICLES -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800">Latest Articles</h3>
-                <a href="#" class="text-xs text-blue-500 hover:underline">View All</a>
+        <div class="rounded-lg shadow-sm overflow-hidden border transition-colors" style="background: var(--sidebar-bg); border-color: var(--border-color)">
+            <div class="px-6 py-4 border-b flex justify-between items-center" style="background: var(--sidebar-hover); border-color: var(--border-color)">
+                <h3 class="font-bold" style="color: var(--text-main)">Latest Articles</h3>
+                <a href="{{ route('admin.news.index') }}" class="text-xs font-bold hover:opacity-80 transition-all uppercase tracking-widest" style="color: var(--primary)">View All</a>
             </div>
             @if($latestArticles->count() > 0)
                 <table class="w-full text-left">
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y" style="border-color: var(--border-color)">
                         @foreach($latestArticles as $article)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <tr class="transition-colors hover:opacity-80" style="background: transparent; border-color: var(--border-color)">
                             <td class="px-6 py-4">
-                                <span class="font-medium text-gray-900 dark:text-gray-100 block">{{ Str::limit($article->title, 40) }}</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ $article->category }}</span>
+                                <span class="font-medium block" style="color: var(--text-main)">{{ Str::limit($article->title, 40) }}</span>
+                                <span class="text-xs" style="color: var(--text-sidebar)">{{ $article->category }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                @php
-                                    $statusClasses = match($article->status) {
-                                        'published' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                                        'draft' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                        'scheduled' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-                                        'archived' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-                                        default => 'bg-gray-100 text-gray-800'
-                                    };
-                                @endphp
-                                <span class="px-2 py-1 rounded text-xs font-semibold {{ $statusClasses }}">
-                                    {{ ucfirst($article->status ?? 'Draft') }}
-                                </span>
+                                <x-status-badge :status="$article->status" />
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ $article->created_at->format('M d') }}</span>
+                                <span class="text-xs" style="color: var(--text-sidebar)">{{ $article->created_at->format('M d') }}</span>
                             </td>
                         </tr>
                         @endforeach
@@ -104,24 +97,23 @@
             @endif
         </div>
 
+        @if(auth()->user()->role === 'admin')
         <!-- RECENT SUBSCRIBERS -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="font-bold text-gray-800">New Subscribers</h3>
-                <a href="{{ route('admin.subscribers') }}" class="text-xs text-blue-500 hover:underline">Manage</a>
+        <div class="rounded-lg shadow-sm overflow-hidden border transition-colors" style="background: var(--sidebar-bg); border-color: var(--border-color)">
+            <div class="px-6 py-4 border-b flex justify-between items-center" style="background: var(--sidebar-hover); border-color: var(--border-color)">
+                <h3 class="font-bold" style="color: var(--text-main)">New Subscribers</h3>
+                <a href="{{ route('admin.subscribers') }}" class="text-xs font-bold hover:opacity-80 transition-all uppercase tracking-widest" style="color: var(--primary)">Manage</a>
             </div>
             @if($recentSubscribers->count() > 0)
                 <table class="w-full text-left">
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y" style="border-color: var(--border-color)">
                         @foreach($recentSubscribers as $sub)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="transition-colors hover:opacity-80" style="background: transparent; border-color: var(--border-color)">
                             <td class="px-6 py-4">
-                                <span class="text-gray-800 block">{{ $sub->email }}</span>
+                                <span class="block font-medium" style="color: var(--text-main)">{{ $sub->email }}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <span class="px-2 py-1 rounded text-xs {{ $sub->status=='active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ ucfirst($sub->status) }}
-                                </span>
+                                <x-status-badge :status="$sub->status" />
                             </td>
                         </tr>
                         @endforeach
@@ -133,5 +125,6 @@
                 </div>
             @endif
         </div>
+        @endif
     </div>
 </x-admin-layout>

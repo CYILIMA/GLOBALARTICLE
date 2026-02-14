@@ -16,6 +16,7 @@ class News extends Model
         'content_version', // v1=HTML, v2=blocks
         'category', // Legacy string
         'category_id', // New relation
+        'user_id', // Author relation
         'image',
         'breaking',
         'status',
@@ -34,6 +35,11 @@ class News extends Model
         'breaking_expires_at' => 'datetime',
         'content_blocks' => 'array', // Cast JSON to array
     ];
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function categoryData()
     {

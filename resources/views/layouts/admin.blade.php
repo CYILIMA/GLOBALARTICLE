@@ -31,6 +31,8 @@
             --button-text: #111827;
             --button-border: #e5e7eb;
             --button-hover: #f3f4f6;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
         }
         .dark {
             /* DARK MODE OVERRIDES */
@@ -46,6 +48,8 @@
             --button-text: #ffffff;
             --button-border: #374151;
             --button-hover: #1f2937;
+            --primary: #000000;
+            --primary-hover: #111827;
         }
 
         .admin-sidebar {
@@ -105,27 +109,38 @@
     <div class="admin-sidebar shadow-lg">
         <!-- Logo Area -->
         <div class="p-6 text-xl font-bold border-b" style="border-color: var(--border-color)">
-            GLOBAL <span class="text-blue-600 dark:text-blue-400">ADMIN</span>
+            GLOBAL <span class="text-blue-600 dark:text-blue-400">{{ auth()->user()->role === 'admin' ? 'ADMIN' : 'ARTICLES' }}</span>
         </div>
         
         <nav class="mt-6">
             <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                Dashboard
+                📊 Dashboard
             </a>
             <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.index') ? 'active' : '' }}">
-                Articles
+                📰 Articles
             </a>
             <a href="{{ route('news.create') }}" class="{{ request()->routeIs('news.create') ? 'active' : '' }}">
-                + Add Article
+                ✍️ New Article
             </a>
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.subscribers') }}" class="{{ request()->routeIs('admin.subscribers') ? 'active' : '' }}">
                 Subscribers
             </a>
+            @endif
+
+            @if(in_array(auth()->user()->role, ['admin', 'editor']))
             <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 Categories
             </a>
+            @endif
+
             <a href="{{ route('admin.media.index') }}" class="{{ request()->routeIs('admin.media.index') ? 'active' : '' }}">
-                Media Library
+                🖼️ Media Library
+            </a>
+
+            @if(auth()->user()->role === 'admin')
+            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                👤 Team Management
             </a>
             
             <!-- Security Section -->
@@ -138,20 +153,25 @@
             <a href="{{ route('admin.security.activity-logs') }}" class="{{ request()->routeIs('admin.security.activity-logs') ? 'active' : '' }}">
                 📋 Activity Logs
             </a>
+            @endif
             
+            @if(in_array(auth()->user()->role, ['admin', 'editor']))
             <!-- Settings -->
             <div class="mt-6 px-5 py-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 System
             </div>
+            @if(auth()->user()->role === 'admin')
             <a href="{{ route('admin.settings.index') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 ⚙️ Settings
             </a>
+            @endif
             <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                 💬 Comments
             </a>
             <a href="{{ route('admin.documentaries.index') }}" class="{{ request()->routeIs('admin.documentaries.*') ? 'active' : '' }}">
                 🎬 Documentaries
             </a>
+            @endif
             
             <form method="POST" action="{{ route('logout') }}" class="mt-10 border-t pt-4" style="border-color: var(--border-color)">
                 @csrf
@@ -186,30 +206,68 @@
                 </button>
 
                 <!-- Dropdown -->
-                <div x-show="open" x-transition class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50" style="display: none;">
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-900 dark:text-white">Notifications</h3>
-                        <button @click="markAllAsRead()" class="text-xs text-blue-600 hover:underline">Mark all read</button>
+                <div x-show="open" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                     class="absolute right-0 mt-3 w-80 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 z-50 overflow-hidden" 
+                     style="display: none;">
+                    
+                    <div class="px-5 py-4 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-gray-900 dark:text-white">Notifications</h3>
+                            <span x-show="unreadCount > 0" class="px-2 py-0.5 text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full font-bold uppercase tracking-wider">New</span>
+                        </div>
+                        <button @click="markAllAsRead()" class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors whitespace-nowrap">
+                            Mark all read
+                        </button>
                     </div>
-                    <div class="max-h-96 overflow-y-auto">
+
+                    <div class="max-h-[450px] overflow-y-auto">
                         <template x-if="notifications.length === 0">
-                            <div class="p-4 text-center text-gray-500 dark:text-gray-400">No notifications</div>
+                            <div class="p-10 text-center flex flex-col items-center gap-3">
+                                <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center text-gray-400 text-3xl mb-1">🔔</div>
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 italic">No notifications yet</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Everything's quiet right now.</p>
+                            </div>
                         </template>
+                        
                         <template x-for="notif in notifications" :key="notif.id">
-                            <div @click="markAsRead(notif.id)" :class="{'bg-blue-50 dark:bg-blue-900/20': !notif.read_at}" class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                                <div class="flex items-start gap-3">
-                                    <span x-text="getIcon(notif.type)" class="text-2xl"></span>
-                                    <div class="flex-1">
-                                        <h4 class="font-semibold text-sm text-gray-900 dark:text-white" x-text="notif.title"></h4>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" x-text="notif.message"></p>
-                                        <span class="text-xs text-gray-400 mt-1 block" x-text="formatTime(notif.created_at)"></span>
+                            <div @click="markAsRead(notif.id)" 
+                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group shadow-sm hover:shadow-inner mb-0.5 last:mb-0">
+                                
+                                <!-- Unread Indicator Dot -->
+                                <div x-show="!notif.read_at" class="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-blue-600 dark:bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div x-show="!notif.read_at" class="absolute right-4 top-4 w-2.5 h-2.5 bg-blue-600 dark:bg-blue-500 rounded-full ring-4 ring-blue-100 dark:ring-blue-900/20"></div>
+
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform group-hover:scale-110" 
+                                         :style="'background: ' + (notif.read_at ? 'var(--sidebar-hover)' : 'rgba(59, 130, 246, 0.1)')"
+                                         x-text="getIcon(notif.type)">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start gap-2">
+                                            <h4 :class="{'font-bold text-gray-900 dark:text-white': !notif.read_at, 'font-medium text-gray-600 dark:text-gray-300': notif.read_at}" 
+                                                class="text-sm leading-tight truncate" 
+                                                x-text="notif.title"></h4>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed" x-text="notif.message"></p>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter" x-text="formatTime(notif.created_at)"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </template>
                     </div>
-                    <div class="p-3 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{ route('admin.notifications.index') }}" class="block text-center text-sm text-blue-600 hover:underline">View all notifications</a>
+
+                    <div class="p-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-200/50 dark:border-gray-700/50">
+                        <a href="{{ route('admin.notifications.index') }}" class="block text-center text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">
+                            View All History
+                        </a>
                     </div>
                 </div>
             </div>

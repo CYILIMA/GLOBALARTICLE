@@ -10,17 +10,19 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $totalNews = News::count();
-        $totalSubscribers = Subscriber::count();
-        $breakingCount = News::where('breaking', 1)->count();
-        
-        // New metrics for Admin Upgrade
-        $draftsCount = News::where('status', 'draft')->count();
-        $scheduledCount = News::where('status', 'scheduled')->count();
-        $publishedCount = News::where('status', 'published')->count();
+        $isAdmin = auth()->user()->role === 'admin';
+        $userId = auth()->id();
 
-        $latestArticles = News::latest()->take(5)->get();
-        $recentSubscribers = Subscriber::latest()->take(5)->get();
+        $totalNews = News::when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+        $totalSubscribers = $isAdmin ? Subscriber::count() : 0;
+        $breakingCount = News::where('breaking', 1)->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+        
+        $draftsCount = News::where('status', 'draft')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+        $scheduledCount = News::where('status', 'scheduled')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+        $publishedCount = News::where('status', 'published')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+
+        $latestArticles = News::latest()->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->take(5)->get();
+        $recentSubscribers = $isAdmin ? Subscriber::latest()->take(5)->get() : collect();
 
         return view('dashboard', compact(
             'totalNews', 
@@ -36,6 +38,7 @@ class AdminController extends Controller
 
     public function subscribers(Request $request)
     {
+        abort_unless(auth()->user()->role === 'admin', 403);
         $query = Subscriber::latest();
 
         if ($request->has('search')) {
@@ -80,6 +83,7 @@ class AdminController extends Controller
 
     public function toggleSubscriberStatus($id)
     {
+        abort_unless(auth()->user()->role === 'admin', 403);
         $subscriber = Subscriber::findOrFail($id);
         $newStatus = $subscriber->status === 'active' ? 'unsubscribed' : 'active';
         $subscriber->update(['status' => $newStatus]);
@@ -89,6 +93,7 @@ class AdminController extends Controller
 
     public function deleteSubscriber($id)
     {
+        abort_unless(auth()->user()->role === 'admin', 403);
         $subscriber = Subscriber::findOrFail($id);
         $subscriber->delete();
 
@@ -97,7 +102,12 @@ class AdminController extends Controller
 
     public function news(Request $request)
     {
-        $query = News::with('categoryData')->latest();
+        $query = News::with(['categoryData', 'author'])->latest();
+
+        // Scope to author if user is an author
+        if (auth()->user()->role === 'author') {
+            $query->where('user_id', auth()->id());
+        }
 
         if ($request->has('status') && $request->status != 'all') {
             $query->where('status', $request->status);

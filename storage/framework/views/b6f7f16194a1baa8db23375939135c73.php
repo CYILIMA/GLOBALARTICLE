@@ -17,7 +17,10 @@
                 <a href="<?php echo e(route('home', ['category' => $item->category])); ?>" class="category-link"><small><?php echo e($item->category); ?></small></a>
                 <h3><a href="<?php echo e(route('news.show', $item)); ?>"><?php echo e($item->title); ?></a></h3>
                 <p><?php echo e(Str::limit(strip_tags($item->content), 150)); ?></p>
-                <div style="margin-top: 10px; font-size: 13px; color: #555;"><?php echo e($item->created_at->diffForHumans()); ?></div>
+                <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                    By <?php echo e($item->author->name ?? 'Global Articles Editor'); ?> &bull; <?php echo e($item->created_at->diffForHumans()); ?>
+
+                </div>
             </div>
         </div>
       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -29,21 +32,7 @@
   </section>
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h3>Recent Headlines</h3>
-    <ul id="latestNews">
-        <?php $__empty_1 = true; $__currentLoopData = $sidebarLatest ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $latest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <li>
-                <a href="<?php echo e(route('news.show', $latest)); ?>">
-                    <span class="headline-title"><?php echo e(Str::limit($latest->title, 70)); ?></span>
-                    <span class="headline-time"><?php echo e($latest->created_at->diffForHumans()); ?></span>
-                </a>
-            </li>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-             <li style="color: var(--text-muted); font-style: italic; padding: 10px 0;">No latest articles found.</li>
-        <?php endif; ?>
-    </ul>
-  </aside>
+  <?php echo $__env->make('partials.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
   <!-- DOCUMENTARY SECTION -->
   <?php if($documentaries->count() > 0): ?>

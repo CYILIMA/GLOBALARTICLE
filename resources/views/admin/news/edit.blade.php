@@ -2,6 +2,17 @@
     @section('header', 'Edit Article')
 
     <div class="max-w-4xl mx-auto space-y-6" x-data>
+        @if ($errors->any())
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm dark:bg-red-900/50 dark:text-red-200" role="alert">
+                <p class="font-bold mb-1">Please fix the following errors:</p>
+                <ul class="list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold dark:text-gray-100">Editing: {{ Str::limit($news->title, 40) }}</h2>
             <form method="POST" action="{{ route('news.destroy', $news) }}" onsubmit="return confirm('Are you sure you want to delete this article?');">
@@ -13,9 +24,13 @@
             </form>
         </div>
 
-        <form action="{{ route('news.update', $news) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('news.update', $news) }}" method="POST" enctype="multipart/form-data" id="articleForm">
             @csrf
             @method('PUT')
+            
+            <!-- Hidden field for block content -->
+            <input type="hidden" name="content_blocks" id="content_blocks" value="{{ json_encode($news->content_blocks) }}">
+            <input type="hidden" name="content_version" value="v2">
 
             <!-- MAIN CONTENT -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6">
@@ -28,15 +43,15 @@
                            placeholder="Enter a catchy title...">
                 </div>
 
-                <!-- Category & Status -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Category, Status, & Author -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                         <select name="category_id" id="category_id" required 
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
                             <option value="">Select a Category...</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ $news->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                <option value="{{ $category->id }}" {{ old('category_id', $news->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -44,28 +59,41 @@
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
                         <select name="status" id="status" required 
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
-                            <option value="draft" {{ $news->status == 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
-                            <option value="published" {{ $news->status == 'published' ? 'selected' : '' }}>Published (Visible immediately)</option>
-                            <option value="scheduled" {{ $news->status == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                            <option value="archived" {{ $news->status == 'archived' ? 'selected' : '' }}>Archived</option>
+                            <option value="draft" {{ old('status', $news->status) == 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
+                            @if(auth()->user()->role !== 'author' || $news->status === 'published')
+                                <option value="published" {{ old('status', $news->status) == 'published' ? 'selected' : '' }}>Published (Visible immediately)</option>
+                                <option value="scheduled" {{ old('status', $news->status) == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                            @endif
+                            <option value="archived" {{ old('status', $news->status) == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
+                        @if(auth()->user()->role === 'author' && $news->status !== 'published')
+                            <p class="text-[10px] text-orange-500 mt-1 uppercase font-bold tracking-tighter">Requires Administrator Approval to Publish</p>
+                        @endif
+                    </div>
+                    <div>
+                        <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Author</label>
+                        <select name="user_id" id="user_id" required 
+                                {{ auth()->user()->role === 'author' ? 'disabled' : '' }}
+                                class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white {{ auth()->user()->role === 'author' ? 'bg-gray-50 opacity-75' : '' }}">
+                            @foreach($authors as $author)
+                                <option value="{{ $author->id }}" {{ (old('user_id', $news->user_id) == $author->id) ? 'selected' : '' }}>
+                                    {{ $author->name }} ({{ ucfirst($author->role) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @if(auth()->user()->role === 'author')
+                            <input type="hidden" name="user_id" value="{{ $news->user_id }}">
+                        @endif
                     </div>
                 </div>
 
-                <!-- Content -->
-                <div x-data="richEditor(`{{ $news->content }}`)" class="relative">
-                    <div class="flex justify-between items-center mb-2">
-                        <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Article Content</label>
-                        <button type="button" @click="$dispatch('open-media-modal')" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md transition flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            Insert from Media Library
-                        </button>
-                    </div>
-                
-                    <div wire:ignore class="prose dark:prose-invert max-w-none">
-                        <textarea x-ref="input" name="content" id="content" class="hidden"></textarea>
-                        <div x-ref="editor"></div>
-                    </div>
+                <!-- Block Editor -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Article Content</label>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        Use the block editor below to structure your article. The first paragraph will automatically be styled as an introduction.
+                    </p>
+                    <div id="editorjs" style="min-height: 400px;" class="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner"></div>
                 </div>
             </div>
 
@@ -73,35 +101,24 @@
              <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 border-b pb-2 dark:border-gray-700">Publishing Settings</h3>
 
-                <!-- Featured Image -->
+                <!-- Article Thumbnail -->
                 <div>
-                    <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Featured Image</label>
+                    <label for="image" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Article Thumbnail</label>
                     
                     @if($news->image)
-                        <div class="mb-3">
-                            <img src="{{ asset('storage/' . $news->image) }}" alt="Current Image" class="w-full h-48 object-cover rounded-md border dark:border-gray-700">
-                            <p class="text-xs text-gray-500 mt-1">Current Image</p>
+                        <div class="mb-3 relative group">
+                            <img src="{{ asset('storage/' . $news->image) }}" alt="Current Thumbnail" class="w-full h-48 object-cover rounded-md border dark:border-gray-700 shadow-sm transition group-hover:opacity-90">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                <span class="bg-black/50 text-white px-3 py-1 rounded-full text-xs font-bold">Current Thumbnail</span>
+                            </div>
                         </div>
                     @endif
 
                     <input type="file" name="image" id="image" accept="image/*" 
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300">
-                    <p class="text-xs text-gray-500 mt-1">Upload to replace current image.</p>
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300 cursor-pointer">
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-2 font-medium">Upload to replace current thumbnail. Max size: 20MB.</p>
                 </div>
 
-                <!-- SEO -->
-                <div class="space-y-4">
-                    <div>
-                        <label for="meta_title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SEO Title (Optional)</label>
-                        <input type="text" name="meta_title" id="meta_title" value="{{ old('meta_title', $news->meta_title) }}"
-                               class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded shadow-sm text-sm dark:text-white">
-                    </div>
-                    <div>
-                        <label for="meta_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SEO Description (Optional)</label>
-                        <textarea name="meta_description" id="meta_description" rows="3" 
-                                  class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded shadow-sm text-sm dark:text-white">{{ old('meta_description', $news->meta_description) }}</textarea>
-                    </div>
-                </div>
 
                 <!-- Breaking News -->
                 <div class="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50 flex-col">
@@ -129,12 +146,189 @@
 
             <!-- ACTIONS -->
             <div class="flex items-center justify-end gap-4 border-t pt-6 dark:border-gray-700">
-                <a href="{{ route('admin.news.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium">Cancel</a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5">
-                    Update Article
+                <a href="{{ route('admin.news.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:white font-medium">Cancel</a>
+                <button type="submit" class="font-bold py-3 px-10 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
+                        style="background: var(--primary); color: #fff;">
+                    {{ $news->status === 'published' ? 'Update Article' : (auth()->user()->role === 'author' ? 'Publish Article' : 'Save Article') }}
                 </button>
             </div>
 
         </form>
     </div>
+
+    <style>
+        /* Editor.js Dark Mode Overrides */
+        .dark .ce-block { color: #e5e7eb; }
+        .dark .ce-paragraph { color: #e5e7eb; }
+        .dark .ce-header { color: #f3f4f6; }
+        .dark .ce-toolbar__actions { background-color: #1f2937; border-radius: 4px; }
+        .dark .ce-toolbar__plus, .dark .ce-toolbar__settings-btn { color: #9ca3af; background-color: #374151; }
+        .dark .ce-toolbar__plus:hover, .dark .ce-toolbar__settings-btn:hover { color: white; background-color: #4b5563; }
+        .dark .ce-popover { background: #1f2937; border: 1px solid #374151; color: #e5e7eb; }
+        .dark .ce-popover__item-icon { background: #374151; color: #e5e7eb; }
+        .dark .ce-popover__item:hover { background: #374151; }
+        .dark .ce-inline-toolbar { background: #1f2937; border: 1px solid #374151; color: #e5e7eb; }
+        .dark .ce-inline-tool:hover { background: #374151; }
+        .dark .cdx-input { background: #111827; border: 1px solid #374151; color: #e5e7eb; }
+        /* Placeholder color */
+        .dark .ce-paragraph[data-placeholder]:empty::before { color: #6b7280; }
+        .dark .ce-header[data-placeholder]:empty::before { color: #6b7280; }
+    </style>
+
+    @push('scripts')
+    <!-- Editor.js Core and Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.28.2?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.7.0?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.8.1?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.5.0?v={{ time() }}"></script>
+
+    <!-- Article Editor Initialization -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let editor;
+
+        try {
+            // Load existing data or old data if validation failed
+            const existingData = @if(old('content_blocks')) {!! old('content_blocks') !!} @else @json($news->content_blocks ?? (object)[]) @endif;
+            
+            // Initialize Editor.js
+            editor = new EditorJS({
+                holder: 'editorjs',
+                data: existingData,
+                autofocus: true,
+                tools: {
+                    header: {
+                        class: Header,
+                        config: {
+                            placeholder: 'Enter a heading',
+                            levels: [2, 3],
+                            defaultLevel: 2
+                        }
+                    },
+                    image: {
+                        class: ImageTool,
+                        config: {
+                            endpoints: {
+                                byFile: '/admin/upload-article-image',
+                            },
+                            field: 'image',
+                            types: 'image/*',
+                            captionPlaceholder: 'Enter image caption (required)',
+                            buttonContent: 'Select an image',
+                            additionalRequestHeaders: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        }
+                    },
+                    quote: {
+                        class: Quote,
+                        inlineToolbar: true,
+                        config: {
+                            quotePlaceholder: 'Enter a quote',
+                            captionPlaceholder: 'Quote author (optional)'
+                        }
+                    }
+                },
+                placeholder: 'Start writing your article...',
+                minHeight: 300,
+            });
+        } catch (error) {
+            console.error('Error initializing Editor.js:', error);
+            alert('Error loading editor: ' + error.message);
+        }
+        
+        // Handle form submission
+        document.getElementById('articleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!editor) {
+                alert('Editor not initialized properly');
+                return;
+            }
+
+            try {
+                // Save editor content
+                const outputData = await editor.save();
+                
+                // Validate that all images have captions
+                const imageBlocks = outputData.blocks.filter(block => block.type === 'image');
+                for (let img of imageBlocks) {
+                    if (!img.data.caption || img.data.caption.trim() === '') {
+                        alert('All images must have captions');
+                        return;
+                    }
+                }
+                
+                // Mark first paragraph as intro
+                if (outputData.blocks.length > 0 && outputData.blocks[0].type === 'paragraph') {
+                    outputData.blocks[0].data.isIntro = true;
+                }
+                
+                // Set the hidden field value
+                document.getElementById('content_blocks').value = JSON.stringify(outputData);
+                
+                // Submit the form
+                this.submit();
+            } catch (error) {
+                alert('Error saving article: ' + error.message);
+                console.error('Save error:', error);
+            }
+        });
+    });
+    </script>
+
+    <style>
+    /* Editor.js Custom Styling */
+    #editorjs {
+        padding: 20px;
+    }
+
+    .ce-block__content,
+    .ce-toolbar__content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .codex-editor__redactor {
+        padding-bottom: 100px !important;
+    }
+
+    .ce-paragraph {
+        line-height: 1.7;
+        font-size: 18px;
+    }
+
+    /* Dark mode support */
+    .dark #editorjs {
+        color: #f3f4f6;
+    }
+
+    .dark .ce-block__content {
+        color: #f3f4f6;
+    }
+
+    .dark .ce-toolbar__plus,
+    .dark .ce-toolbar__settings-btn {
+        color: #f3f4f6;
+    }
+
+    .dark .ce-inline-toolbar,
+    .dark .ce-conversion-toolbar,
+    .dark .ce-settings {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .dark .ce-inline-tool,
+    .dark .ce-conversion-tool,
+    .dark .ce-settings__button {
+        color: #f3f4f6;
+    }
+
+    .dark .ce-inline-tool:hover,
+    .dark .ce-settings__button:hover {
+        background-color: #374151;
+    }
+    </style>
+    @endpush
 </x-admin-layout>
