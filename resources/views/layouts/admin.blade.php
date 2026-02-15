@@ -33,6 +33,9 @@
             --button-hover: #f3f4f6;
             --primary: #3b82f6;
             --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-bg-hover: #fef2f2;
+            --link-primary: #3b82f6;
         }
         .dark {
             /* DARK MODE OVERRIDES */
@@ -48,20 +51,39 @@
             --button-text: #ffffff;
             --button-border: #374151;
             --button-hover: #1f2937;
-            --primary: #000000;
-            --primary-hover: #111827;
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --danger: #f87171;
+            --danger-bg-hover: rgba(248, 113, 113, 0.1);
+            --link-primary: #60a5fa;
         }
 
         .admin-sidebar {
             width: 260px;
             background: var(--sidebar-bg);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
             transition: background 0.3s, border 0.3s;
             border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: hidden;
+            z-index: 50;
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 30px; /* Better padding for the last item */
+        }
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
         }
         .admin-sidebar a {
             color: var(--text-sidebar);
@@ -101,6 +123,23 @@
         .dark .text-gray-900 { color: #f3f4f6 !important; }
         .dark .text-gray-800 { color: #f3f4f6 !important; }
         .dark .text-gray-600 { color: #9ca3af !important; }
+
+        .logout-btn {
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            width: 100%;
+            font-size: 0.875rem;
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: var(--danger-bg-hover);
+            transform: translateX(4px);
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-gray-900 bg-gray-100 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -112,74 +151,100 @@
             GLOBAL <span class="text-blue-600 dark:text-blue-400">{{ auth()->user()->role === 'admin' ? 'ADMIN' : 'ARTICLES' }}</span>
         </div>
         
-        <nav class="mt-6">
-            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                📊 Dashboard
-            </a>
-            <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.index') ? 'active' : '' }}">
-                📰 Articles
-            </a>
-            <a href="{{ route('news.create') }}" class="{{ request()->routeIs('news.create') ? 'active' : '' }}">
-                ✍️ New Article
-            </a>
-            @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.subscribers') }}" class="{{ request()->routeIs('admin.subscribers') ? 'active' : '' }}">
-                Subscribers
-            </a>
-            @endif
+        <div class="sidebar-nav">
+            <nav class="mt-6">
+                <!-- MAIN SECTION -->
+                <div class="px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Main
+                </div>
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    📊 Dashboard
+                </a>
 
-            @if(in_array(auth()->user()->role, ['admin', 'editor']))
-            <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-                Categories
-            </a>
-            @endif
+                <!-- CONTENT SECTION -->
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Content
+                </div>
+                <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.index') ? 'active' : '' }}">
+                    📰 Articles
+                </a>
+                <a href="{{ route('news.create') }}" class="{{ request()->routeIs('news.create') ? 'active' : '' }}">
+                    ✍️ New Article
+                </a>
+                @if(in_array(auth()->user()->role, ['admin', 'editor']))
+                <a href="{{ route('admin.documentaries.index') }}" class="{{ request()->routeIs('admin.documentaries.*') ? 'active' : '' }}">
+                    🎬 Documentaries
+                </a>
+                <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                    📁 Categories
+                </a>
+                <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                    💬 Comments
+                </a>
+                @endif
+                <a href="{{ route('admin.media.index') }}" class="{{ request()->routeIs('admin.media.index') ? 'active' : '' }}">
+                    🖼️ Media Library
+                </a>
 
-            <a href="{{ route('admin.media.index') }}" class="{{ request()->routeIs('admin.media.index') ? 'active' : '' }}">
-                🖼️ Media Library
-            </a>
+                <!-- COMMUNITY SECTION -->
+                @if(auth()->user()->role === 'admin')
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Community
+                </div>
+                <a href="{{ route('admin.subscribers') }}" class="{{ request()->routeIs('admin.subscribers') ? 'active' : '' }}">
+                    👥 Subscribers
+                </a>
+                @endif
 
-            @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                👤 Team Management
-            </a>
-            
-            <!-- Security Section -->
-            <div class="mt-6 px-5 py-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Security
-            </div>
-            <a href="{{ route('admin.security.login-history') }}" class="{{ request()->routeIs('admin.security.login-history') ? 'active' : '' }}">
-                🔒 Login History
-            </a>
-            <a href="{{ route('admin.security.activity-logs') }}" class="{{ request()->routeIs('admin.security.activity-logs') ? 'active' : '' }}">
-                📋 Activity Logs
-            </a>
-            @endif
-            
-            @if(in_array(auth()->user()->role, ['admin', 'editor']))
-            <!-- Settings -->
-            <div class="mt-6 px-5 py-2 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                System
-            </div>
-            @if(auth()->user()->role === 'admin')
-            <a href="{{ route('admin.settings.index') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                ⚙️ Settings
-            </a>
-            @endif
-            <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
-                💬 Comments
-            </a>
-            <a href="{{ route('admin.documentaries.index') }}" class="{{ request()->routeIs('admin.documentaries.*') ? 'active' : '' }}">
-                🎬 Documentaries
-            </a>
-            @endif
-            
-            <form method="POST" action="{{ route('logout') }}" class="mt-10 border-t pt-4" style="border-color: var(--border-color)">
+                <!-- ADMINISTRATION SECTION -->
+                @if(auth()->user()->role === 'admin')
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Administration
+                </div>
+                <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    👤 Team Management
+                </a>
+                @endif
+                
+                <!-- SECURITY SECTION -->
+                @if(auth()->user()->role === 'admin')
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Security
+                </div>
+                <a href="{{ route('admin.security.login-history') }}" class="{{ request()->routeIs('admin.security.login-history') ? 'active' : '' }}">
+                    🔒 Login History
+                </a>
+                <a href="{{ route('admin.security.activity-logs') }}" class="{{ request()->routeIs('admin.security.activity-logs') ? 'active' : '' }}">
+                    📋 Activity Logs
+                </a>
+                @endif
+                
+                <!-- SYSTEM SECTION -->
+                @if(in_array(auth()->user()->role, ['admin', 'editor']))
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    System
+                </div>
+                @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.settings.index') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    ⚙️ Settings
+                </a>
+                @endif
+                @endif
+            </nav>
+        </div>
+
+        <!-- FOOTER / LOGOUT -->
+        <div class="p-4 border-t" style="border-color: var(--border-color)">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full text-left px-5 py-3 text-red-600 hover:text-red-700 hover:bg-gray-100 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-gray-800 transition font-medium">
+                <button type="submit" class="logout-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4-4H7m6 4v1a3 3 0 01-6 0v-1m6 0H9"></path>
+                    </svg>
                     Logout
                 </button>
             </form>
-        </nav>
+        </div>
     </div>
 
     <!-- MAIN CONTENT -->
