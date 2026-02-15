@@ -40,11 +40,6 @@ class AppServiceProvider extends ServiceProvider
                     $categories = \App\Models\Category::all();
                     $view->with('globalCategories', $categories);
                 }
-
-                if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                    $settings = \App\Models\Setting::getAll();
-                    $view->with('globalSettings', $settings);
-                }
             } catch (\Exception $e) {
                 // Ignore DB errors during setup
             }

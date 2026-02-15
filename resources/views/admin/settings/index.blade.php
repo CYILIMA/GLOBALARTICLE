@@ -14,12 +14,6 @@
                 <button @click="activeTab = 'content'" :class="activeTab === 'content' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'" class="px-6 py-3 border-b-2 font-medium text-sm transition">
                     Content
                 </button>
-                <button @click="activeTab = 'social'" :class="activeTab === 'social' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'" class="px-6 py-3 border-b-2 font-medium text-sm transition">
-                    Social
-                </button>
-                <button @click="activeTab = 'contact'" :class="activeTab === 'contact' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'" class="px-6 py-3 border-b-2 font-medium text-sm transition">
-                    Contact
-                </button>
                 <button @click="activeTab = 'advanced'" :class="activeTab === 'advanced' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'" class="px-6 py-3 border-b-2 font-medium text-sm transition">
                     Advanced
                 </button>
@@ -84,42 +78,6 @@
                         @endif
                     </div>
                 @endforeach
-            </div>
-
-            <!-- Social Settings -->
-            <div x-show="activeTab === 'social'" class="space-y-4" style="display: none;">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Social Media Links</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($settings['social'] ?? [] as $setting)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ ucwords(str_replace(['_', 'social '], [' ', ''], $setting->key)) }}
-                        </label>
-                        <input type="url" name="settings[{{ $setting->key }}]" value="{{ $setting->value }}" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-white" placeholder="https://...">
-                        @if($setting->description)
-                            <p class="text-xs text-gray-500 mt-1">{{ $setting->description }}</p>
-                        @endif
-                    </div>
-                @endforeach
-                </div>
-            </div>
-
-            <!-- Contact Settings -->
-            <div x-show="activeTab === 'contact'" class="space-y-4" style="display: none;">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Contact Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($settings['contact'] ?? [] as $setting)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ ucwords(str_replace(['_', 'contact '], [' ', ''], $setting->key)) }}
-                        </label>
-                        <input type="text" name="settings[{{ $setting->key }}]" value="{{ $setting->value }}" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-white">
-                        @if($setting->description)
-                            <p class="text-xs text-gray-500 mt-1">{{ $setting->description }}</p>
-                        @endif
-                    </div>
-                @endforeach
-                </div>
             </div>
 
             <!-- Advanced Settings -->

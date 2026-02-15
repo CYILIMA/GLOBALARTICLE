@@ -28,9 +28,7 @@
                                     @if($documentary->thumbnail)
                                         <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="" class="w-16 h-10 object-cover rounded">
                                     @else
-                                        <div class="w-16 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded flex items-center justify-center text-white">
-                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 7L17 11V7L5 7L5 17L17 17V13L21 17V7Z"/></svg>
-                                        </div>
+                                        <div class="w-16 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded flex items-center justify-center text-white">🎬</div>
                                     @endif
                                     <div>
                                         <div class="font-semibold text-gray-900 dark:text-white">{{ $documentary->title }}</div>

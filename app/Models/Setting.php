@@ -48,7 +48,6 @@ class Setting extends Model
         // Clear cache
         Cache::forget("setting_{$key}");
         Cache::forget('all_settings');
-        Cache::forget('settings_flat');
 
         return $setting;
     }
@@ -64,22 +63,11 @@ class Setting extends Model
     }
 
     /**
-     * Get all settings as key-value pairs
-     */
-    public static function getAll()
-    {
-        return Cache::remember('settings_flat', self::CACHE_DURATION, function () {
-            return self::all()->pluck('value', 'key');
-        });
-    }
-
-    /**
      * Clear all settings cache
      */
     public static function clearCache()
     {
         Cache::forget('all_settings');
-        Cache::forget('settings_flat');
         self::all()->each(function ($setting) {
             Cache::forget("setting_{$setting->key}");
         });
