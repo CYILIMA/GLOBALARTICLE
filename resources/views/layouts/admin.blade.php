@@ -185,6 +185,11 @@
                 <a href="{{ route('admin.media.index') }}" class="{{ request()->routeIs('admin.media.index') ? 'active' : '' }}">
                     🖼️ Media Library
                 </a>
+                @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.analytics.index') }}" class="{{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
+                    📈 Analytics
+                </a>
+                @endif
 
                 <!-- COMMUNITY SECTION -->
                 @if(auth()->user()->role === 'admin')

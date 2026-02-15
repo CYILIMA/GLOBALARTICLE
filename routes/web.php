@@ -40,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // News Management
     Route::get('/dashboard/news', [AdminController::class, 'news'])->name('admin.news.index');
+    Route::get('/dashboard/analytics', [\App\Http\Controllers\Admin\ArticleAnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::post('/news', [NewsController::class, 'store'])->name('news.store');
     Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
     Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');

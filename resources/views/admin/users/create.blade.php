@@ -32,7 +32,7 @@
                     <input type="email" name="email" id="email" value="{{ old('email') }}" required 
                            class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all" 
                            style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)"
-                           placeholder="email@example.com">
+                           placeholder="user@globalarticles.com">
                     @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 

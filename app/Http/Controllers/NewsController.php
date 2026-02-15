@@ -38,7 +38,14 @@ class NewsController extends Controller
 
     public function show(News $news)
     {
-        // Increment views
+        // Log the view in article_views table (real tracking)
+        \App\Models\ArticleView::create([
+            'news_id' => $news->id,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        // Still increment the main counter for simple display and sorting
         $news->increment('views');
 
         $relatedNews = News::where('category_id', $news->category_id)

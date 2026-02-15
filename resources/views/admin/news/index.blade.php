@@ -26,6 +26,9 @@
                     <th class="px-6 py-3">Category</th>
                     <th class="px-6 py-3">Author</th>
                     <th class="px-6 py-3">Status</th>
+                    @if(auth()->user()->role === 'admin')
+                    <th class="px-6 py-3">Views</th>
+                    @endif
                     <th class="px-6 py-3">Published</th>
                     <th class="px-6 py-3 text-right">Actions</th>
                 </tr>
@@ -63,6 +66,11 @@
                     <td class="px-6 py-4">
                         <x-status-badge :status="$article->status" />
                     </td>
+                    @if(auth()->user()->role === 'admin')
+                    <td class="px-6 py-4">
+                        <span class="font-black text-sm" style="color: var(--text-main)">{{ number_format($article->views) }}</span>
+                    </td>
+                    @endif
                     <td class="px-6 py-4 text-xs" style="color: var(--text-sidebar)">
                         {{ $article->published_at ? $article->published_at->format('M d, Y H:i') : '-' }}
                     </td>
