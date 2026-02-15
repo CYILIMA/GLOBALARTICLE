@@ -27,6 +27,7 @@ class NewsController extends Controller
         // Get documentaries
         $documentaries = \App\Models\Documentary::where('status', 'published')
             ->latest()
+            ->with('author')
             ->take(6)
             ->get();
 

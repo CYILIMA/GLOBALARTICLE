@@ -10,6 +10,7 @@ class Documentary extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
         'description',
         'content',
@@ -41,6 +42,12 @@ class Documentary extends Model
     public function incrementViews()
     {
         $this->increment('views');
+    }
+
+    // Relationships
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function isPublished()
