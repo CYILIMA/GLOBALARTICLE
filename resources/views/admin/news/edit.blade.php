@@ -147,10 +147,22 @@
             <!-- ACTIONS -->
             <div class="flex items-center justify-end gap-4 border-t pt-6 dark:border-gray-700">
                 <a href="{{ route('admin.news.index') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:white font-medium">Cancel</a>
-                <button type="submit" class="font-bold py-3 px-10 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
-                        style="background: var(--primary); color: #fff;">
-                    {{ $news->status === 'published' ? 'Update Article' : (auth()->user()->role === 'author' ? 'Publish Article' : 'Save Article') }}
-                </button>
+                
+                @if($news->status === 'pending' && auth()->user()->role !== 'author')
+                    <button type="button" @click="document.getElementById('status').value = 'published'; $nextTick(() => document.getElementById('articleForm').requestSubmit())" 
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:-translate-y-0.5">
+                        Approve & Publish
+                    </button>
+                    <button type="button" @click="document.getElementById('status').value = 'draft'; $nextTick(() => document.getElementById('articleForm').requestSubmit())" 
+                            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:-translate-y-0.5">
+                        Reject to Draft
+                    </button>
+                @else
+                    <button type="submit" class="font-bold py-3 px-10 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5"
+                            style="background: var(--primary); color: #fff;">
+                        {{ $news->status === 'published' ? 'Update Article' : (auth()->user()->role === 'author' && $news->status !== 'published' ? 'Submit for Review' : 'Save Article') }}
+                    </button>
+                @endif
             </div>
 
         </form>

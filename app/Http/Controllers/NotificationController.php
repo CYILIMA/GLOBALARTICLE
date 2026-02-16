@@ -41,7 +41,11 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        return response()->json(['success' => true]);
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Notification marked as read');
     }
 
     public function markAllAsRead()
@@ -50,7 +54,11 @@ class NotificationController extends Controller
             ->unread()
             ->update(['read_at' => now()]);
 
-        return response()->json(['success' => true]);
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back()->with('success', 'All notifications marked as read');
     }
 
     public function destroy($id)

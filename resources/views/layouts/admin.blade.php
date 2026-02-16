@@ -283,51 +283,47 @@
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                      x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                     class="absolute right-0 mt-3 w-80 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 z-50 overflow-hidden" 
+                     class="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden" 
                      style="display: none;">
                     
-                    <div class="px-5 py-4 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
+                    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
                         <div class="flex items-center gap-2">
                             <h3 class="font-bold text-gray-900 dark:text-white">Notifications</h3>
-                            <span x-show="unreadCount > 0" class="px-2 py-0.5 text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full font-bold uppercase tracking-wider">New</span>
+                            <span x-show="unreadCount > 0" class="px-2 py-0.5 text-[10px] bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full font-bold uppercase tracking-wider" x-text="unreadCount"></span>
                         </div>
                         <button @click="markAllAsRead()" class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors whitespace-nowrap">
                             Mark all read
                         </button>
                     </div>
 
-                    <div class="max-h-[450px] overflow-y-auto">
+                    <div class="max-h-[400px] overflow-y-auto custom-scrollbar">
                         <template x-if="notifications.length === 0">
                             <div class="p-10 text-center flex flex-col items-center gap-3">
                                 <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center text-gray-400 text-3xl mb-1">🔔</div>
                                 <p class="text-sm font-medium text-gray-900 dark:text-gray-100 italic">No notifications yet</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Everything's quiet right now.</p>
                             </div>
                         </template>
                         
                         <template x-for="notif in notifications" :key="notif.id">
-                            <div @click="markAsRead(notif.id)" 
-                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group shadow-sm hover:shadow-inner mb-0.5 last:mb-0">
+                            <div @click="handleNotificationClick(notif)" 
+                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group">
                                 
-                                <!-- Unread Indicator Dot -->
-                                <div x-show="!notif.read_at" class="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-blue-600 dark:bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <div x-show="!notif.read_at" class="absolute right-4 top-4 w-2.5 h-2.5 bg-blue-600 dark:bg-blue-500 rounded-full ring-4 ring-blue-100 dark:ring-blue-900/20"></div>
+                                <!-- Unread Indicator -->
+                                <div x-show="!notif.read_at" class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500"></div>
 
-                                <div class="flex items-start gap-4">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform group-hover:scale-110" 
-                                         :style="'background: ' + (notif.read_at ? 'var(--sidebar-hover)' : 'rgba(59, 130, 246, 0.1)')"
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0" 
+                                         :class="notif.read_at ? 'bg-gray-100 dark:bg-gray-700' : 'bg-blue-50 dark:bg-blue-900/30'"
                                          x-text="getIcon(notif.type)">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex justify-between items-start gap-2">
-                                            <h4 :class="{'font-bold text-gray-900 dark:text-white': !notif.read_at, 'font-medium text-gray-600 dark:text-gray-300': notif.read_at}" 
-                                                class="text-sm leading-tight truncate" 
+                                        <div class="flex justify-between items-start">
+                                            <h4 :class="{'font-bold text-black dark:text-white': !notif.read_at, 'text-gray-600 dark:text-gray-400 font-medium': notif.read_at}" 
+                                                class="text-sm leading-tight truncate pr-4" 
                                                 x-text="notif.title"></h4>
+                                            <span class="text-[9px] font-bold text-gray-400 shrink-0" x-text="formatTime(notif.created_at)"></span>
                                         </div>
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed" x-text="notif.message"></p>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter" x-text="formatTime(notif.created_at)"></span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -458,17 +454,33 @@
                 
                 async markAsRead(id) {
                     try {
-                        await fetch(`/notifications/${id}/read`, {
+                        const response = await fetch(`/notifications/${id}/read`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
                             }
                         });
-                        this.loadUnreadCount();
-                        this.loadNotifications();
+                        
+                        if (response.ok) {
+                            this.loadUnreadCount();
+                            this.loadNotifications();
+                        }
                     } catch (error) {
                         console.error('Failed to mark as read:', error);
+                    }
+                },
+
+                handleNotificationClick(notif) {
+                    // Mark as read first
+                    if (!notif.read_at) {
+                        this.markAsRead(notif.id);
+                    }
+
+                    // Navigate if link exists
+                    if (notif.data && notif.data.link) {
+                        window.location.href = notif.data.link;
                     }
                 },
                 
@@ -491,7 +503,8 @@
                 getIcon(type) {
                     const icons = {
                         'comment': '💬',
-                        'article_published': '📰',
+                        'article_published': '✅',
+                        'article_pending': '⏳',
                         'system_warning': '⚠️',
                         'email_failed': '📧'
                     };

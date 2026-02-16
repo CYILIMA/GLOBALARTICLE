@@ -126,9 +126,19 @@ class NewsController extends Controller
             'meta_description' => $request->meta_description,
         ]);
 
+        // Enforcement of publishing rights for Authors
+        if ($news->status === 'published' && auth()->user()->role === 'author') {
+            $news->update(['status' => 'pending', 'published_at' => null]);
+            
+            // Notify Admins
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                \App\Services\NotificationService::articlePendingReview($admin->id, $news);
+            }
+        }
 
         // Trigger Breaking News Emails
-        if ($news->breaking && $news->status == 'published') {
+        if ($news->status === 'published' && $news->breaking) {
             $subscribers = \App\Models\Subscriber::where('status', 'active')->get();
             foreach ($subscribers as $sub) {
                 try {
@@ -188,6 +198,8 @@ class NewsController extends Controller
             $expiresAt = now()->addHours(24);
         }
 
+        $oldStatus = $news->status;
+
         $news->update([
             'title' => $request->title,
             'content' => $request->content ?? '', // Fallback for v2 blocks
@@ -204,6 +216,22 @@ class NewsController extends Controller
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
         ]);
+
+        // Enforcement for authors
+        if ($news->status === 'published' && auth()->user()->role === 'author' && $oldStatus !== 'published') {
+            $news->update(['status' => 'pending', 'published_at' => null]);
+            
+            // Notify Admins
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                \App\Services\NotificationService::articlePendingReview($admin->id, $news);
+            }
+        }
+
+        // Notify Author if Admin publishes their pending article
+        if ($oldStatus === 'pending' && $news->status === 'published') {
+            \App\Services\NotificationService::articlePublished($news->user_id, $news);
+        }
 
         $message = auth()->user()->role === 'author' && $news->status !== 'published'
             ? 'Article updated and remains in review/draft status.' 

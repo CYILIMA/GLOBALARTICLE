@@ -30,7 +30,27 @@ class NotificationService
             'article_published',
             'Article Published',
             "Your article \"{$article->title}\" has been published successfully.",
-            ['article_id' => $article->id]
+            [
+                'article_id' => $article->id,
+                'link' => route('news.show', $article)
+            ]
+        );
+    }
+
+    /**
+     * Notify Admin about new article pending review
+     */
+    public static function articlePendingReview($userId, $article)
+    {
+        return self::create(
+            $userId,
+            'article_pending',
+            'Article Pending Review',
+            "New article \"{$article->title}\" requires your approval.",
+            [
+                'article_id' => $article->id,
+                'link' => route('news.edit', $article)
+            ]
         );
     }
 
