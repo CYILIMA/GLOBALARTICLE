@@ -9,7 +9,12 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = News::with(['categoryData', 'author'])->where('status', 'published')->latest();
+        $query = News::with(['categoryData', 'author'])
+            ->where('status', 'published')
+            ->whereHas('categoryData', function($q) {
+                $q->where('slug', '!=', 'documentary');
+            })
+            ->latest();
 
         // Filter by category if provided
         if ($request->has('category')) {

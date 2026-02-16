@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('admin123'),
         ]);
 
-        $this->call([
-            CategoryImportSeeder::class,
-        ]);
+        // $this->call([
+        //     CategoryImportSeeder::class,
+        // ]);
     }
 }

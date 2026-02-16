@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 if (\Illuminate\Support\Facades\Schema::hasTable('categories')) {
-                    $categories = \App\Models\Category::all();
+                    $categories = \App\Models\Category::where('slug', '!=', 'documentary')->get();
                     $view->with('globalCategories', $categories);
                 }
 

@@ -28,8 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Public news routes (wildcard must come after specific routes)
 Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
 
+Route::get('/documentaries', [DocumentaryController::class, 'index'])->name('documentaries.index');
 Route::get('/documentaries/{documentary}', [DocumentaryController::class, 'show'])->name('documentaries.show');
-Route::redirect('/documentaries', '/#documentaryArea');
 Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('/subscribe', [SubscriberController::class, 'store'])->name('subscribe');
 Route::get('/unsubscribe', [SubscriberController::class, 'unsubscribe'])->name('unsubscribe');

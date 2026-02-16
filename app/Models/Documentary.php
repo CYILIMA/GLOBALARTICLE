@@ -11,6 +11,7 @@ class Documentary extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
         'title',
         'description',
         'content',
@@ -20,6 +21,11 @@ class Documentary extends Model
         'published_at',
         'views',
     ];
+
+    public function categoryData()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 
     protected $casts = [
         'published_at' => 'datetime',

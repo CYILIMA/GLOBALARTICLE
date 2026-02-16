@@ -18,7 +18,8 @@ class DocumentaryManagementController extends Controller
 
     public function create()
     {
-        return view('admin.documentaries.create');
+        $categories = \App\Models\Category::all();
+        return view('admin.documentaries.create', compact('categories'));
     }
 
     public function show(Documentary $documentary)
@@ -31,6 +32,7 @@ class DocumentaryManagementController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'content' => 'required|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -45,6 +47,7 @@ class DocumentaryManagementController extends Controller
 
         $documentary = Documentary::create([
             'user_id' => auth()->id(),
+            'category_id' => $request->category_id,
             'title' => $request->title,
             'description' => $request->description,
             'content' => $request->content,
@@ -62,13 +65,15 @@ class DocumentaryManagementController extends Controller
 
     public function edit(Documentary $documentary)
     {
-        return view('admin.documentaries.edit', compact('documentary'));
+        $categories = \App\Models\Category::all();
+        return view('admin.documentaries.edit', compact('documentary', 'categories'));
     }
 
     public function update(Request $request, Documentary $documentary)
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'content' => 'required|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -82,6 +87,7 @@ class DocumentaryManagementController extends Controller
         }
 
         $documentary->update([
+            'category_id' => $request->category_id,
             'title' => $request->title,
             'description' => $request->description,
             'content' => $request->content,
