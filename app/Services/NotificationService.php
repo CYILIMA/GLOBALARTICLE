@@ -67,6 +67,7 @@ class NotificationService
             [
                 'comment_id' => $comment->id,
                 'article_id' => $article->id,
+                'link' => route('news.show', $article->slug) . '#comment-' . $comment->id
             ]
         );
     }

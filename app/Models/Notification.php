@@ -23,6 +23,14 @@ class Notification extends Model
         'read_at' => 'datetime',
     ];
 
+    /**
+     * Prepare a date for array / JSON serialization.
+     */
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+        return $date->format('c'); // ISO 8601
+    }
+
     // Relationships
     public function user()
     {

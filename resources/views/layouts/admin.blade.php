@@ -306,20 +306,21 @@
                         
                         <template x-for="notif in notifications" :key="notif.id">
                             <div @click="handleNotificationClick(notif)" 
-                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group">
+                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group"
+                                 :class="notif.read_at ? 'bg-transparent' : 'bg-blue-50/30 dark:bg-blue-900/10'">
                                 
                                 <!-- Unread Indicator -->
                                 <div x-show="!notif.read_at" class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500"></div>
 
                                 <div class="flex items-start gap-3">
                                     <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0" 
-                                         :class="notif.read_at ? 'bg-gray-100 dark:bg-gray-700' : 'bg-blue-50 dark:bg-blue-900/30'"
+                                         :class="notif.read_at ? 'bg-gray-100 dark:bg-gray-700' : 'bg-blue-100/50 dark:bg-blue-900/40'"
                                          x-text="getIcon(notif.type)">
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="flex justify-between items-start">
-                                            <h4 :class="{'font-bold text-black dark:text-white': !notif.read_at, 'text-gray-600 dark:text-gray-400 font-medium': notif.read_at}" 
-                                                class="text-sm leading-tight truncate pr-4" 
+                                            <h4 :class="{'font-bold text-gray-900 dark:text-white': !notif.read_at, 'text-gray-500 dark:text-gray-400 font-medium': notif.read_at}" 
+                                                class="text-sm leading-tight pr-4 break-words" 
                                                 x-text="notif.title"></h4>
                                             <span class="text-[9px] font-bold text-gray-400 shrink-0" x-text="formatTime(notif.created_at)"></span>
                                         </div>
@@ -478,9 +479,21 @@
                         this.markAsRead(notif.id);
                     }
 
-                    // Navigate if link exists
+                    // Navigate if link exists in data
                     if (notif.data && notif.data.link) {
                         window.location.href = notif.data.link;
+                        return;
+                    }
+
+                    // Fallback links for older notifications without direct links
+                    const fallbacks = {
+                        'comment': '{{ route("admin.comments.index") }}',
+                        'article_published': '/',
+                        'article_pending': '{{ route("admin.news.index") }}'
+                    };
+
+                    if (fallbacks[notif.type]) {
+                        window.location.href = fallbacks[notif.type];
                     }
                 },
                 
