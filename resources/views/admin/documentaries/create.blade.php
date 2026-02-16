@@ -50,9 +50,14 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status *</label>
                     <select name="status" required class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-white">
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
+                        <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                        @can('publish', App\Models\Documentary::class)
+                            <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published</option>
+                        @endcan
                     </select>
+                    @cannot('publish', App\Models\Documentary::class)
+                        <p class="text-[10px] text-orange-500 mt-1 uppercase font-bold tracking-tighter">Requires Administrator Approval to Publish</p>
+                    @endcannot
                 </div>
             </div>
 

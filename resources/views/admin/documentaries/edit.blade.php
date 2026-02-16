@@ -54,9 +54,20 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status *</label>
                     <select name="status" required class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-white">
-                        <option value="draft" {{ $documentary->status === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="published" {{ $documentary->status === 'published' ? 'selected' : '' }}>Published</option>
+                        <option value="draft" {{ old('status', $documentary->status) === 'draft' ? 'selected' : '' }}>Draft</option>
+                        @can('publish', App\Models\Documentary::class)
+                            <option value="published" {{ old('status', $documentary->status) === 'published' ? 'selected' : '' }}>Published</option>
+                        @else
+                            @if($documentary->status === 'published')
+                                <option value="published" selected>Published (Read-only)</option>
+                            @endif
+                        @endcan
                     </select>
+                    @cannot('publish', App\Models\Documentary::class)
+                        @if($documentary->status !== 'published')
+                            <p class="text-[10px] text-orange-500 mt-1 uppercase font-bold tracking-tighter">Requires Administrator Approval to Publish</p>
+                        @endif
+                    @endcannot
                 </div>
             </div>
 

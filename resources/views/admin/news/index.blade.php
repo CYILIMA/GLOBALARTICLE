@@ -6,10 +6,10 @@
         <!-- Toolbar -->
         <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-4" style="background: var(--sidebar-hover); border-color: var(--border-color)">
             <div class="flex gap-2">
-                <a href="{{ route('dashboard', ['status' => 'all']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'all' || !request('status') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">All</a>
-                <a href="{{ route('dashboard', ['status' => 'published']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Published</a>
-                <a href="{{ route('dashboard', ['status' => 'draft']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'draft' ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Drafts</a>
-                <a href="{{ route('dashboard', ['status' => 'scheduled']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'scheduled' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Scheduled</a>
+                <a href="{{ route('admin.news.index', ['status' => 'all']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'all' || !request('status') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">All</a>
+                <a href="{{ route('admin.news.index', ['status' => 'published']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Published</a>
+                <a href="{{ route('admin.news.index', ['status' => 'draft']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'draft' ? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Drafts</a>
+                <a href="{{ route('admin.news.index', ['status' => 'scheduled']) }}" class="px-3 py-1 rounded-full text-sm font-medium {{ request('status') == 'scheduled' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">Scheduled</a>
             </div>
 
             <a href="{{ route('news.create') }}" class="text-sm font-bold py-2 px-4 rounded transition flex items-center gap-2 border" style="background: var(--button-bg); color: var(--button-text); border-color: var(--button-border);">
@@ -75,8 +75,16 @@
                         {{ $article->published_at ? $article->published_at->format('M d, Y H:i') : '-' }}
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <!-- Actions would go here -->
-                        <a href="{{ route('news.edit', $article) }}" class="text-blue-600 hover:underline text-sm">Edit</a>
+                        <div class="flex justify-end gap-3">
+                            <a href="{{ route('news.edit', $article) }}" class="text-blue-600 hover:underline text-sm font-bold uppercase tracking-tighter">Edit</a>
+                            @can('delete', $article)
+                            <form action="{{ route('news.destroy', $article) }}" method="POST" onsubmit="return confirm('Archive/Delete this article?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold uppercase tracking-tighter">Delete</button>
+                            </form>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
                 @endforeach
