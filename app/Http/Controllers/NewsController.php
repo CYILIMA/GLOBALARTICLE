@@ -16,9 +16,11 @@ class NewsController extends Controller
             })
             ->latest();
 
-        // Filter by category if provided
+        // Filter by category slug if provided
         if ($request->has('category')) {
-            $query->where('category', $request->category);
+            $query->whereHas('categoryData', function($q) use ($request) {
+                $q->where('slug', $request->category);
+            });
         }
 
         $news = $query->paginate(12);
