@@ -62,4 +62,9 @@ class Documentary extends Model
                $this->published_at && 
                $this->published_at->isPast();
     }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
 }

@@ -30,7 +30,11 @@
                 </div>
                 
                 <div class="flex gap-3">
-                     <label for="file-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md">
+                     <label for="file-upload" 
+                            style="background: var(--primary);" 
+                            onmouseover="this.style.background='var(--primary-hover)'"
+                            onmouseout="this.style.background='var(--primary)'"
+                            class="cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         Upload Files
                      </label>

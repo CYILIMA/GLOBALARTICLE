@@ -51,6 +51,8 @@
                             @if(auth()->user()->role !== 'author')
                                 <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published (Visible immediately)</option>
                                 <option value="scheduled" {{ old('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                            @else
+                                <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published (Submit for Approval)</option>
                             @endif
                             <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>

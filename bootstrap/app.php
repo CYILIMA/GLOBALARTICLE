@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->respond(function ($response, $e, $request) {
+            if ($response->getStatusCode() === 419 && $request->routeIs('logout')) {
+                return redirect('/');
+            }
+            return $response;
+        });
     })->create();

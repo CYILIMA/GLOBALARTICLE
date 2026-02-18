@@ -26,4 +26,5 @@
  Thumbs.db
  *.log
  .DS_Store
+/.gemini
 

@@ -55,4 +55,12 @@ class News extends Model
     {
         return $query->where('status', 'published');
     }
+
+    /**
+     * Accessor to strip trailing mock numbers like " (1)" from titles.
+     */
+    public function getTitleAttribute($value)
+    {
+        return preg_replace('/\s\(\d+\)$/', '', $value);
+    }
 }

@@ -32,6 +32,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="p-4 rounded-lg shadow-sm flex items-center justify-between border transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color)">
             <div>
+                <div class="text-[10px] uppercase font-black tracking-wider" style="color: var(--text-sidebar)">Pending Review</div>
+                <div class="text-2xl font-black" style="color: {{ $pendingCount > 0 ? '#f59e0b' : 'var(--text-main)' }}">{{ $pendingCount }}</div>
+            </div>
+            <div class="p-2 rounded bg-orange-100/10 text-orange-600 dark:text-orange-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+        </div>
+        <div class="p-4 rounded-lg shadow-sm flex items-center justify-between border transition-all" style="background: var(--sidebar-bg); border-color: var(--border-color)">
+            <div>
                 <div class="text-[10px] uppercase font-black tracking-wider" style="color: var(--text-sidebar)">Drafts</div>
                 <div class="text-2xl font-black" style="color: var(--text-main)">{{ $draftsCount }}</div>
             </div>
@@ -77,7 +86,9 @@
                         @foreach($latestArticles as $article)
                         <tr class="transition-colors hover:opacity-80" style="background: transparent; border-color: var(--border-color)">
                             <td class="px-6 py-4">
-                                <span class="font-bold text-sm block mb-0.5" style="color: var(--text-main)">{{ Str::limit($article->title, 40) }}</span>
+                                <a href="{{ route('news.edit', $article) }}" class="hover:underline">
+                                    <span class="font-bold text-sm block mb-0.5" style="color: var(--text-main)">{{ Str::limit($article->title, 40) }}</span>
+                                </a>
                                 <span class="text-[10px] font-black uppercase tracking-wider" style="color: var(--text-sidebar)">{{ $article->category }}</span>
                             </td>
                             <td class="px-6 py-4">

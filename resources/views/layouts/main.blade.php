@@ -50,7 +50,7 @@
       <ul>
         <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
-            @foreach($globalCategories->take(7) as $cat)
+            @foreach($globalCategories->where('slug', '!=', 'documentary')->take(7) as $cat)
                 <li>
                     <a href="{{ url('/?category=' . $cat->slug) }}" 
                        class="{{ request('category') == $cat->slug ? 'active' : '' }}">
@@ -63,7 +63,7 @@
                 <li class="nav-dropdown">
                     <a href="#" class="nav-dropdown-trigger">MORE ▾</a>
                     <div class="nav-dropdown-content">
-                        @foreach($globalCategories->skip(7) as $cat)
+                        @foreach($globalCategories->where('slug', '!=', 'documentary')->skip(7) as $cat)
                             <a href="{{ url('/?category=' . $cat->slug) }}"
                                class="{{ request('category') == $cat->slug ? 'text-blue-600' : '' }}">
                                 {{ $cat->name }}
@@ -146,25 +146,28 @@
   @endif
 </header>
 
-<main class="container">
+<main class="@yield('main_class', 'container')">
     @yield('content')
 </main>
 
 <footer>
   <div class="subscribe-container" id="subscribeSection">
-    <h3>Subscribe for instant breaking news</h3>
-    <form id="subscribeForm" action="{{ route('subscribe') }}" method="POST">
-        @csrf
-        <div class="subscribe-wrapper">
-            <input type="email" id="subEmail" name="email" placeholder="Enter your email address" required>
-            <button type="submit" id="subBtn">
-                <span class="btn-text">SUBSCRIBE</span>
-                <span class="btn-loader hidden">...</span>
-            </button>
-        </div>
-        <div id="subMessage" class="subscribe-message hidden"></div>
-    </form>
-    <p class="sub-footer">No spam. Unsubscribe anytime.</p>
+    <div id="subscribeFormWrapper">
+      <h3>Subscribe for instant breaking news</h3>
+      <p class="subscribe-subtitle mb-8 text-gray-400">Join our growing community getting the latest global news in their inbox.</p>
+      <form id="subscribeForm" action="{{ route('subscribe') }}" method="POST">
+          @csrf
+          <div class="subscribe-wrapper">
+              <input type="email" id="subEmail" name="email" placeholder="Enter your email address" required>
+              <button type="submit" id="subBtn">
+                  <span class="btn-text">SUBSCRIBE</span>
+                  <span class="btn-loader hidden">...</span>
+              </button>
+          </div>
+      </form>
+      <p class="sub-footer">No spam. Unsubscribe anytime.</p>
+    </div>
+    <div id="subMessage" class="subscribe-message hidden"></div>
   </div>
   <div class="footer-grid">
     <div class="footer-col">
@@ -181,7 +184,7 @@
         <h4>Browse Categories</h4>
         <div class="footer-links-grid">
             @if(isset($globalCategories))
-                @foreach($globalCategories as $cat)
+                @foreach($globalCategories->where('slug', '!=', 'documentary') as $cat)
                     <a href="{{ url('/?category=' . $cat->slug) }}">{{ $cat->name }}</a>
                 @endforeach
             @else

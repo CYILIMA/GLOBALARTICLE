@@ -55,12 +55,16 @@ class CommentController extends Controller
             'flag_reason' => $flagReason,
         ]);
 
-        // Notify admin
-        \App\Services\NotificationService::newComment(
-            1, // Admin user ID
-            $comment,
-            $news
-        );
+        // Notify Admins for moderation
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            \App\Services\NotificationService::newComment($admin->id, $comment, $news);
+        }
+
+        // Notify Author if the commenter is not the author themselves
+        if ($news->user_id && $news->user_id !== auth()->id()) {
+            \App\Services\NotificationService::newComment($news->user_id, $comment, $news);
+        }
 
         return back()->with('success', 'Your comment has been submitted and is awaiting moderation.');
     }

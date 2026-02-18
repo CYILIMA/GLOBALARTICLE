@@ -15,16 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('admin123'),
+        // Seed default categories for production
+        $this->call([
+            CategoryImportSeeder::class,
         ]);
-
-        // $this->call([
-        //     CategoryImportSeeder::class,
-        // ]);
+        
+        // Note: Create your first admin user manually via:
+        // php artisan tinker
+        // User::create(['name' => 'Your Name', 'email' => 'your@email.com', 'password' => bcrypt('your-secure-password'), 'role' => 'admin']);
     }
 }

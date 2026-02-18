@@ -60,9 +60,15 @@
                         <select name="status" id="status" required 
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
                             <option value="draft" {{ old('status', $news->status) == 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
-                            @if(auth()->user()->role !== 'author' || $news->status === 'published')
+                            @if(auth()->user()->role !== 'author')
                                 <option value="published" {{ old('status', $news->status) == 'published' ? 'selected' : '' }}>Published (Visible immediately)</option>
                                 <option value="scheduled" {{ old('status', $news->status) == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                <option value="pending" {{ old('status', $news->status) == 'pending' ? 'selected' : '' }}>Pending Approval</option>
+                            @else
+                                @if($news->status === 'pending')
+                                    <option value="pending" selected>Pending Approval (Submitted)</option>
+                                @endif
+                                <option value="published" {{ old('status', $news->status) == 'published' ? 'selected' : '' }}>{{ $news->status === 'pending' ? 'Re-submit for Approval' : 'Published (Submit for Approval)' }}</option>
                             @endif
                             <option value="archived" {{ old('status', $news->status) == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>

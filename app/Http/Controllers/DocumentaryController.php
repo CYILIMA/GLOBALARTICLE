@@ -4,29 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\Documentary;
 use App\Models\Category;
+use App\Models\News;
 use Illuminate\Http\Request;
 
 class DocumentaryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Documentary::published()->with(['author', 'categoryData'])->latest();
-
-        // Filter by category if provided
-        if ($request->has('category')) {
-            $query->whereHas('categoryData', function($q) use ($request) {
-                $q->where('slug', $request->category);
+        $categorySlug = $request->category;
+        
+        // 1. Fetch Traditional Documentaries
+        $docQuery = Documentary::published()->with(['author', 'categoryData']);
+        if ($categorySlug) {
+            $docQuery->whereHas('categoryData', function($q) use ($categorySlug) {
+                $q->where('slug', $categorySlug);
             });
         }
+        $traditionalDocs = $docQuery->get();
 
-        $documentaries = $query->paginate(12);
+        // 2. Fetch News Articles in the Documentary Category (only if no specific sub-category filter or if filter is 'documentary')
+        $newsDocs = collect();
+        if (!$categorySlug || $categorySlug === 'documentary') {
+            $newsDocs = News::published()
+                ->whereHas('categoryData', function($q) {
+                    $q->where('slug', 'documentary');
+                })
+                ->with(['author', 'categoryData'])
+                ->get();
+        }
+
+        // 3. Merge and Sort
+        $allDocumentaries = $traditionalDocs->concat($newsDocs)
+            ->sortByDesc('published_at');
+
+        // 4. Paginate the merged collection
+        $perPage = 12;
+        $page = $request->get('page', 1);
+        $documentaries = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allDocumentaries->forPage($page, $perPage),
+            $allDocumentaries->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
         $categories = Category::whereHas('news', function($q) {
-                // You might want to filter categories that have documentaries
+                // Filter categories that actually have content
             })->orWhereExists(function ($query) {
                $query->select(\DB::raw(1))
                      ->from('documentaries')
                      ->whereRaw('documentaries.category_id = categories.id');
-           })->get();
+            })->get();
 
         return view('documentaries.index', compact('documentaries', 'categories'));
     }

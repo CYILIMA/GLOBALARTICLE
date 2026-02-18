@@ -153,7 +153,11 @@
                         🗑️ Clear Cache
                     </button>
                 </form>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
+                <button type="submit" 
+                        style="background: var(--primary);" 
+                        onmouseover="this.style.background='var(--primary-hover)'"
+                        onmouseout="this.style.background='var(--primary)'"
+                        class="text-white px-6 py-2 rounded-lg transition">
                     Save Settings
                 </button>
             </div>

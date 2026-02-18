@@ -55,6 +55,40 @@ class NotificationService
     }
 
     /**
+     * Notify about documentary publication
+     */
+    public static function documentaryPublished($userId, $documentary)
+    {
+        return self::create(
+            $userId,
+            'documentary_published',
+            'Documentary Published',
+            "Your documentary \"{$documentary->title}\" has been published successfully.",
+            [
+                'documentary_id' => $documentary->id,
+                'link' => route('documentaries.show', $documentary)
+            ]
+        );
+    }
+
+    /**
+     * Notify Admin about new documentary pending review
+     */
+    public static function documentaryPendingReview($userId, $documentary)
+    {
+        return self::create(
+            $userId,
+            'documentary_pending',
+            'Documentary Pending Review',
+            "New documentary \"{$documentary->title}\" requires your approval.",
+            [
+                'documentary_id' => $documentary->id,
+                'link' => route('admin.documentaries.edit', $documentary)
+            ]
+        );
+    }
+
+    /**
      * Notify about new comment
      */
     public static function newComment($userId, $comment, $article)

@@ -47,12 +47,13 @@ class DocumentaryManagementController extends Controller
             'content' => 'required|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'video_url' => 'nullable|url',
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:draft,published,pending',
         ]);
 
         // Enforcement of publishing rights
-        if ($request->status === 'published' && !auth()->user()->can('publish', Documentary::class)) {
-            return back()->withInput()->with('error', 'You do not have permission to publish. Your entry has been saved as a draft.');
+        $finalStatus = $request->status;
+        if ($finalStatus === 'published' && !auth()->user()->can('publish', Documentary::class)) {
+            $finalStatus = 'pending';
         }
 
         $thumbnailPath = null;
@@ -68,14 +69,25 @@ class DocumentaryManagementController extends Controller
             'content' => $request->content,
             'thumbnail' => $thumbnailPath,
             'video_url' => $request->video_url,
-            'status' => $request->status,
-            'published_at' => $request->status == 'published' ? now() : null,
+            'status' => $finalStatus,
+            'published_at' => $finalStatus == 'published' ? now() : null,
         ]);
+
+        // Notify Admins if Pending
+        if ($documentary->status === 'pending') {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                \App\Services\NotificationService::documentaryPendingReview($admin->id, $documentary);
+            }
+        }
 
         ActivityLog::log('created', 'Documentary', $documentary->id, "Created documentary: {$documentary->title}");
 
-        return redirect()->route('admin.documentaries.index')
-            ->with('success', 'Documentary created successfully!');
+        $message = $documentary->status === 'pending' 
+            ? 'Documentary submitted successfully and is awaiting administrator approval.' 
+            : 'Documentary created successfully!';
+
+        return redirect()->route('admin.documentaries.index')->with('success', $message);
     }
 
     public function edit(Documentary $documentary)
@@ -96,18 +108,21 @@ class DocumentaryManagementController extends Controller
             'content' => 'required|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'video_url' => 'nullable|url',
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:draft,published,pending',
         ]);
 
         // Enforcement of publishing rights
-        if ($request->status === 'published' && !auth()->user()->can('publish', Documentary::class)) {
-            $request->merge(['status' => 'draft']); // Force draft if not admin/editor
+        $finalStatus = $request->status;
+        if ($finalStatus === 'published' && !auth()->user()->can('publish', Documentary::class)) {
+            $finalStatus = 'pending';
         }
 
         $thumbnailPath = $documentary->thumbnail;
         if ($request->hasFile('thumbnail')) {
             $thumbnailPath = $request->file('thumbnail')->store('documentaries', 'public');
         }
+
+        $oldStatus = $documentary->status;
 
         $documentary->update([
             'category_id' => $request->category_id,
@@ -116,14 +131,30 @@ class DocumentaryManagementController extends Controller
             'content' => $request->content,
             'thumbnail' => $thumbnailPath,
             'video_url' => $request->video_url,
-            'status' => $request->status,
-            'published_at' => $request->status == 'published' && !$documentary->published_at ? now() : $documentary->published_at,
+            'status' => $finalStatus,
+            'published_at' => $finalStatus == 'published' && !$documentary->published_at ? now() : $documentary->published_at,
         ]);
+
+        // Notify Admins if newly Pending
+        if ($oldStatus !== 'pending' && $documentary->status === 'pending') {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                \App\Services\NotificationService::documentaryPendingReview($admin->id, $documentary);
+            }
+        }
+
+        // Notify Author if Admin publishes their pending entry
+        if ($oldStatus === 'pending' && $documentary->status === 'published') {
+            \App\Services\NotificationService::documentaryPublished($documentary->user_id, $documentary);
+        }
 
         ActivityLog::log('updated', 'Documentary', $documentary->id, "Updated documentary: {$documentary->title}");
 
-        return redirect()->route('admin.documentaries.index')
-            ->with('success', 'Documentary updated successfully!');
+        $message = $documentary->status === 'pending' && $oldStatus !== 'pending'
+            ? 'Documentary updated and submitted for review.' 
+            : 'Documentary updated successfully!';
+
+        return redirect()->route('admin.documentaries.index')->with('success', $message);
     }
 
     public function destroy(Documentary $documentary)

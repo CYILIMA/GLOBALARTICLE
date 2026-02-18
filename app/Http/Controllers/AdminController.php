@@ -17,9 +17,10 @@ class AdminController extends Controller
         $totalSubscribers = $isAdmin ? Subscriber::count() : 0;
         $breakingCount = News::where('breaking', 1)->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
         
+        $publishedCount = News::where('status', 'published')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
+        $pendingCount = News::where('status', 'pending')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
         $draftsCount = News::where('status', 'draft')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
         $scheduledCount = News::where('status', 'scheduled')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
-        $publishedCount = News::where('status', 'published')->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->count();
 
         $latestArticles = News::latest()->when(!$isAdmin, fn($q) => $q->where('user_id', $userId))->take(5)->get();
         $recentSubscribers = $isAdmin ? Subscriber::latest()->take(5)->get() : collect();
@@ -28,9 +29,10 @@ class AdminController extends Controller
             'totalNews', 
             'totalSubscribers', 
             'breakingCount', 
+            'publishedCount',
+            'pendingCount',
             'draftsCount',
             'scheduledCount',
-            'publishedCount',
             'latestArticles', 
             'recentSubscribers'
         ));

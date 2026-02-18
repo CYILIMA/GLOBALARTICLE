@@ -13,7 +13,11 @@ class NotificationController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('admin.notifications.index', compact('notifications'));
+        $unreadCount = Notification::where('user_id', auth()->id())
+            ->unread()
+            ->count();
+
+        return view('admin.notifications.index', compact('notifications', 'unreadCount'));
     }
 
     public function getUnreadCount()
@@ -25,10 +29,11 @@ class NotificationController extends Controller
         return response()->json(['count' => $count]);
     }
 
-    public function getRecent()
+    public function getRecent(Request $request)
     {
+        $count = $request->get('count', 5);
         $notifications = Notification::where('user_id', auth()->id())
-            ->recent(5)
+            ->recent($count)
             ->get();
 
         return response()->json($notifications);

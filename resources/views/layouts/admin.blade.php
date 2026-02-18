@@ -140,6 +140,24 @@
             background: var(--danger-bg-hover);
             transform: translateX(4px);
         }
+
+        /* Notification Drawer Styles */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-gray-900 bg-gray-100 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -171,10 +189,12 @@
                 <a href="{{ route('news.create') }}" class="{{ request()->routeIs('news.create') ? 'active' : '' }}">
                     ✍️ New Article
                 </a>
-                @if(in_array(auth()->user()->role, ['admin', 'editor']))
+                @if(in_array(auth()->user()->role, ['admin', 'editor', 'author']))
                 <a href="{{ route('admin.documentaries.index') }}" class="{{ request()->routeIs('admin.documentaries.*') ? 'active' : '' }}">
                     🎬 Documentaries
                 </a>
+@endif
+@if(in_array(auth()->user()->role, ['admin', 'editor']))
                 <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                     📁 Categories
                 </a>
@@ -210,6 +230,119 @@
                     👤 Team Management
                 </a>
                 @endif
+
+                <!-- NOTIFICATIONS SECTION -->
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Activity
+                </div>
+                <div x-data="notificationSystem()" class="relative">
+                    <button @click="open = true; loadNotifications()" class="w-full text-left px-5 py-3 flex items-center justify-between group hover:bg-gray-100 dark:hover:bg-gray-800 transition-all rounded-r-xl border-l-4 border-transparent hover:border-blue-500">
+                        <div class="flex items-center gap-3">
+                            <span class="w-5 h-5 flex items-center justify-center group-hover:scale-110 transition-transform text-gray-400 group-hover:text-blue-500">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                            </span>
+                            <span class="font-bold text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-100">Notifications</span>
+                        </div>
+                        <template x-if="unreadCount > 0">
+                            <span x-text="unreadCount" class="px-2 py-0.5 bg-blue-500 text-white text-[10px] font-black rounded-full shadow-sm"></span>
+                        </template>
+                    </button>
+
+                    <!-- Sidebar Drawer Backdrop -->
+                    <div x-show="open" 
+                         x-transition:enter="transition opacity-100 ease-out duration-300"
+                         x-transition:leave="transition opacity-0 ease-in duration-200"
+                         @click="open = false" 
+                         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
+                         style="display: none;"></div>
+
+                    <!-- Sidebar Drawer Panel -->
+                    <div x-show="open" 
+                         x-transition:enter="transition transform ease-out duration-300"
+                         x-transition:enter-start="-translate-x-full"
+                         x-transition:enter-end="translate-x-0"
+                         x-transition:leave="transition transform ease-in duration-200"
+                         x-transition:leave-start="translate-x-0"
+                         x-transition:leave-end="-translate-x-full"
+                         class="fixed left-0 top-0 bottom-0 w-[420px] bg-white dark:bg-[#0f172a] shadow-[0_0_50px_rgba(0,0,0,0.2)] z-[70] flex flex-col border-r border-gray-100 dark:border-slate-800"
+                         style="display: none;">
+                        
+                         <!-- Header -->
+                        <div class="p-8 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/30 dark:bg-slate-900/40 backdrop-blur-md">
+                            <div class="flex items-center gap-4">
+                                <h3 class="font-bold text-2xl tracking-tight text-gray-900 dark:text-slate-100">Notifications</h3>
+                                <template x-if="unreadCount > 0">
+                                    <span class="px-3 py-1 text-[11px] rounded-lg font-bold tracking-tight text-white bg-indigo-500 shadow-sm shadow-indigo-500/30" x-text="unreadCount + ' new'"></span>
+                                </template>
+                            </div>
+                            <button @click="open = false" class="p-2.5 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all hover:rotate-90">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="px-8 py-3 bg-white dark:bg-slate-900 border-b border-gray-50 dark:border-slate-800/50 flex justify-between items-center">
+                             <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">Recent Notifications</span>
+                             <button @click="markAllAsRead()" 
+                                     class="text-[10px] font-bold uppercase tracking-widest text-indigo-500 hover:text-indigo-600 transition-all flex items-center gap-2 group"
+                                     :class="unreadCount === 0 ? 'opacity-50 cursor-not-allowed' : ''"
+                                     :disabled="unreadCount === 0 || loading">
+                                <svg x-show="!loading" class="w-3.5 h-3.5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                <svg x-show="loading" class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span x-text="loading ? 'Updating...' : 'Mark all as read'"></span>
+                            </button>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 overflow-y-auto custom-scrollbar">
+                            <template x-if="notifications.length === 0">
+                                <div class="py-24 px-10 text-center flex flex-col items-center gap-5">
+                                    <div class="w-24 h-24 rounded-[2rem] bg-gray-50 dark:bg-gray-800/50 flex items-center justify-center text-5xl opacity-40">🌙</div>
+                                    <div class="space-y-2">
+                                        <p class="text-xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tighter">Quiet Day</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">No new notifications to show right now.</p>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <div class="divide-y divide-gray-50 dark:divide-slate-800/40">
+                                <template x-for="notif in notifications" :key="notif.id">
+                                    <div @click="handleNotificationClick(notif)" 
+                                         class="p-6 hover:bg-gray-50 dark:hover:bg-slate-800/30 cursor-pointer transition-all relative group"
+                                         :class="notif.read_at ? 'opacity-50' : 'bg-indigo-50/20 dark:bg-indigo-500/5'">
+                                        
+                                        <!-- Unread Indicator Dot -->
+                                        <div x-show="!notif.read_at" 
+                                             class="absolute left-4 top-8 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
+
+                                        <div class="flex items-start gap-4">
+                                            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105" 
+                                                 :class="notif.read_at ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500' : 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'"
+                                                 x-html="getIcon(notif.type)">
+                                            </div>
+                                            <div class="flex-1 min-w-0 overflow-hidden">
+                                                <div class="flex justify-between items-start gap-2 mb-0.5">
+                                                    <h4 class="text-[12px] font-bold text-gray-900 dark:text-slate-200 leading-snug break-all" x-text="notif.title"></h4>
+                                                    <span class="text-[9px] font-bold text-gray-400 dark:text-slate-500 whitespace-nowrap tabular-nums" x-text="formatTime(notif.created_at)"></span>
+                                                </div>
+                                                <p class="text-[11px] text-gray-500 dark:text-slate-400 font-medium leading-relaxed break-all whitespace-normal" x-text="notif.message"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-8 bg-gray-50/30 dark:bg-slate-900/40 backdrop-blur-md border-t border-gray-100 dark:border-slate-800">
+                            <a href="{{ route('admin.notifications.index') }}" 
+                               class="flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 text-[11px] font-bold uppercase tracking-widest transition-all hover:-translate-y-0.5 text-gray-600 dark:text-slate-300 group">
+                                View full activity log
+                                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- SECURITY SECTION -->
                 @if(auth()->user()->role === 'admin')
@@ -235,6 +368,7 @@
                 </a>
                 @endif
                 @endif
+
             </nav>
         </div>
 
@@ -266,78 +400,7 @@
                 <span id="themeIcon" class="text-xl">🌙</span>
             </button>
 
-            <!-- Notification Bell -->
-            <div x-data="notificationBell()" @click.away="open = false" class="relative">
-                <button @click="open = !open; if(open) loadNotifications()" class="relative p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
-                    <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"></span>
-                </button>
 
-                <!-- Dropdown -->
-                <div x-show="open" 
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 translate-y-2 scale-95"
-                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                     x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                     class="absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden" 
-                     style="display: none;">
-                    
-                    <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-gray-900 dark:text-white">Notifications</h3>
-                            <span x-show="unreadCount > 0" class="px-2 py-0.5 text-[10px] bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full font-bold uppercase tracking-wider" x-text="unreadCount"></span>
-                        </div>
-                        <button @click="markAllAsRead()" class="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors whitespace-nowrap">
-                            Mark all read
-                        </button>
-                    </div>
-
-                    <div class="max-h-[400px] overflow-y-auto custom-scrollbar">
-                        <template x-if="notifications.length === 0">
-                            <div class="p-10 text-center flex flex-col items-center gap-3">
-                                <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center text-gray-400 text-3xl mb-1">🔔</div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 italic">No notifications yet</p>
-                            </div>
-                        </template>
-                        
-                        <template x-for="notif in notifications" :key="notif.id">
-                            <div @click="handleNotificationClick(notif)" 
-                                 class="p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 cursor-pointer transition-all relative group"
-                                 :class="notif.read_at ? 'bg-transparent' : 'bg-blue-50/30 dark:bg-blue-900/10'">
-                                
-                                <!-- Unread Indicator -->
-                                <div x-show="!notif.read_at" class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 dark:bg-blue-500"></div>
-
-                                <div class="flex items-start gap-3">
-                                    <div class="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0" 
-                                         :class="notif.read_at ? 'bg-gray-100 dark:bg-gray-700' : 'bg-blue-100/50 dark:bg-blue-900/40'"
-                                         x-text="getIcon(notif.type)">
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex justify-between items-start">
-                                            <h4 :class="{'font-bold text-gray-900 dark:text-white': !notif.read_at, 'text-gray-500 dark:text-gray-400 font-medium': notif.read_at}" 
-                                                class="text-sm leading-tight pr-4 break-words" 
-                                                x-text="notif.title"></h4>
-                                            <span class="text-[9px] font-bold text-gray-400 shrink-0" x-text="formatTime(notif.created_at)"></span>
-                                        </div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed" x-text="notif.message"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <div class="p-3 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-200/50 dark:border-gray-700/50">
-                        <a href="{{ route('admin.notifications.index') }}" class="block text-center text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">
-                            View All History
-                        </a>
-                    </div>
-                </div>
-            </div>
 
             <!-- User Dropdown -->
             <div class="relative" x-data="{ open: false }" @click.outside="open = false">
@@ -421,16 +484,16 @@
     @stack('scripts')
 
     <script>
-        // Notification Bell Alpine Component
-        function notificationBell() {
+        // Notification System (Drawer) logic
+        function notificationSystem() {
             return {
                 open: false,
                 notifications: [],
                 unreadCount: 0,
+                loading: false,
                 
                 init() {
                     this.loadUnreadCount();
-                    // Poll for new notifications every 30 seconds
                     setInterval(() => this.loadUnreadCount(), 30000);
                 },
                 
@@ -446,7 +509,7 @@
                 
                 async loadNotifications() {
                     try {
-                        const response = await fetch('{{ route("admin.notifications.recent") }}');
+                        const response = await fetch('{{ route("admin.notifications.recent") }}?count=15');
                         this.notifications = await response.json();
                     } catch (error) {
                         console.error('Failed to load notifications:', error);
@@ -455,7 +518,7 @@
                 
                 async markAsRead(id) {
                     try {
-                        const response = await fetch(`/notifications/${id}/read`, {
+                        const response = await fetch(`{{ url('/notifications') }}/${id}/read`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -474,18 +537,15 @@
                 },
 
                 handleNotificationClick(notif) {
-                    // Mark as read first
                     if (!notif.read_at) {
                         this.markAsRead(notif.id);
                     }
 
-                    // Navigate if link exists in data
                     if (notif.data && notif.data.link) {
                         window.location.href = notif.data.link;
                         return;
                     }
 
-                    // Fallback links for older notifications without direct links
                     const fallbacks = {
                         'comment': '{{ route("admin.comments.index") }}',
                         'article_published': '/',
@@ -498,30 +558,41 @@
                 },
                 
                 async markAllAsRead() {
+                    if (this.loading) return;
+                    this.loading = true;
                     try {
-                        await fetch('{{ route("admin.notifications.read-all") }}', {
+                        const response = await fetch('{{ route("admin.notifications.read-all") }}', {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
                             }
                         });
-                        this.unreadCount = 0;
-                        this.loadNotifications();
+                        
+                        if (response.ok) {
+                            this.unreadCount = 0;
+                            await Promise.all([
+                                this.loadNotifications(),
+                                this.loadUnreadCount()
+                            ]);
+                        }
                     } catch (error) {
                         console.error('Failed to mark all as read:', error);
+                    } finally {
+                        this.loading = false;
                     }
                 },
                 
                 getIcon(type) {
                     const icons = {
-                        'comment': '💬',
-                        'article_published': '✅',
-                        'article_pending': '⏳',
-                        'system_warning': '⚠️',
-                        'email_failed': '📧'
+                        'comment': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>`,
+                        'article_published': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                        'article_pending': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`,
+                        'system_warning': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`,
+                        'email_failed': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
                     };
-                    return icons[type] || '🔔';
+                    return icons[type] || `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`;
                 },
                 
                 formatTime(timestamp) {
@@ -532,7 +603,8 @@
                     if (diff < 60) return 'Just now';
                     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
                     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-                    return `${Math.floor(diff / 86400)}d ago`;
+                    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+                    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                 }
             }
         }

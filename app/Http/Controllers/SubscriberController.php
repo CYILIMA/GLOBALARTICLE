@@ -27,10 +27,10 @@ class SubscriberController extends Controller
         }
 
         if ($request->wantsJson()) {
-            return response()->json(['message' => 'Thank you for subscribing! Please check your email.']);
+            return response()->json(['message' => 'Welcome to the inner circle! 🚀 Check your inbox for your first update.']);
         }
 
-        return back()->with('success', 'Thank you for subscribing! Please check your email.');
+        return back()->with('success', 'Welcome to the inner circle! 🚀 Check your inbox for your first update.');
     }
 
     public function unsubscribe(Request $request)

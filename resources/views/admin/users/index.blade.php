@@ -9,7 +9,11 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage administrators, editors, and authors who contribute to Global Articles.</p>
             </div>
 
-            <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 px-6 rounded-lg transition flex items-center gap-2 shadow-md hover:shadow-lg">
+            <a href="{{ route('admin.users.create') }}" 
+               style="background: var(--primary);" 
+               onmouseover="this.style.background='var(--primary-hover)'"
+               onmouseout="this.style.background='var(--primary)'"
+               class="text-white text-sm font-bold py-2.5 px-6 rounded-lg transition flex items-center gap-2 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Add New Member
             </a>
@@ -44,8 +48,7 @@
                             <x-role-badge :role="$user->role" />
                         </td>
                         <td class="px-6 py-4">
-                             <!-- This could be a count of articles written by this user -->
-                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $user->id }} Articles</span>
+                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $user->articles_count }} Articles</span>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                             {{ $user->created_at->format('M d, Y') }}

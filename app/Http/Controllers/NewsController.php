@@ -31,12 +31,25 @@ class NewsController extends Controller
             ->take(5)
             ->get();
 
-        // Get documentaries
-        $documentaries = \App\Models\Documentary::where('status', 'published')
+        // Get unified documentaries for home page
+        $traditionalDocs = \App\Models\Documentary::published()
             ->latest()
             ->with('author')
             ->take(6)
             ->get();
+            
+        $newsDocs = \App\Models\News::published()
+            ->whereHas('categoryData', function($q) {
+                $q->where('slug', 'documentary');
+            })
+            ->latest()
+            ->with('author')
+            ->take(6)
+            ->get();
+
+        $documentaries = $traditionalDocs->concat($newsDocs)
+            ->sortByDesc('published_at')
+            ->take(6);
 
         $category = $request->category ?? null;
 
@@ -130,7 +143,7 @@ class NewsController extends Controller
         if ($news->status === 'published' && auth()->user()->role === 'author') {
             $news->update(['status' => 'pending', 'published_at' => null]);
             
-            // Notify Admins
+            // Notify ALL Admins
             $admins = \App\Models\User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
                 \App\Services\NotificationService::articlePendingReview($admin->id, $news);
@@ -218,7 +231,7 @@ class NewsController extends Controller
         ]);
 
         // Enforcement for authors
-        if ($news->status === 'published' && auth()->user()->role === 'author' && $oldStatus !== 'published') {
+        if ($news->status === 'published' && auth()->user()->role === 'author') {
             $news->update(['status' => 'pending', 'published_at' => null]);
             
             // Notify Admins

@@ -21,7 +21,11 @@
 
             <div class="flex items-center justify-end gap-4 mt-6">
                 <a href="{{ route('admin.categories.index') }}" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white">Cancel</a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow">
+                <button type="submit" 
+                        style="background: var(--primary);" 
+                        onmouseover="this.style.background='var(--primary-hover)'"
+                        onmouseout="this.style.background='var(--primary)'"
+                        class="text-white font-bold py-2 px-6 rounded shadow">
                     Update Category
                 </button>
             </div>

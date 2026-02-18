@@ -4,7 +4,11 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
             <h3 class="font-bold text-gray-800 dark:text-gray-100">All Categories</h3>
-            <a href="{{ route('admin.categories.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition">
+            <a href="{{ route('admin.categories.create') }}" 
+               style="background: var(--primary);" 
+               onmouseover="this.style.background='var(--primary-hover)'"
+               onmouseout="this.style.background='var(--primary)'"
+               class="text-white text-sm font-bold py-2 px-4 rounded transition">
                 + New Category
             </a>
         </div>

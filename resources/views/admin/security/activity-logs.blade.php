@@ -21,7 +21,11 @@
 
                 <input type="date" name="date" value="{{ request('date') }}" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg text-sm dark:text-white">
 
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">Filter</button>
+                <button type="submit" 
+                        style="background: var(--primary);" 
+                        onmouseover="this.style.background='var(--primary-hover)'"
+                        onmouseout="this.style.background='var(--primary)'"
+                        class="text-white px-4 py-2 rounded-lg text-sm transition">Filter</button>
                 <a href="{{ route('admin.security.activity-logs') }}" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm transition">Clear</a>
             </form>
         </div>

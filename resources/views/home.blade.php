@@ -20,7 +20,7 @@
                 <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                 <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                 <div style="margin-top: 10px; font-size: 13px; color: #555;">
-                    By {{ $item->author->name ?? 'Global Articles Editor' }} &bull; {{ $item->created_at->diffForHumans() }}
+                    By {{ $item->author->name ?? \App\Models\Setting::get('site_name', 'Global Articles') }} &bull; {{ $item->created_at->diffForHumans() }}
                 </div>
             </div>
         </div>
@@ -55,12 +55,17 @@
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 px-4">
-              @foreach($documentaries as $documentary)
+              @foreach($documentaries as $doc)
+                @php
+                    $isNews = $doc instanceof \App\Models\News;
+                    $showUrl = $isNews ? route('news.show', $doc) : route('documentaries.show', $doc);
+                    $imageUrl = $isNews ? ($doc->image ? asset('storage/' . $doc->image) : null) : ($doc->thumbnail ? asset('storage/' . $doc->thumbnail) : null);
+                @endphp
               <article class="group relative bg-white dark:bg-[#0a0a0a] rounded-[2rem] overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-[0_40px_80px_-20px_rgba(139,92,246,0.15)] transition-all duration-700 hover:-translate-y-3 border border-gray-100 dark:border-white/5">
-                  <a href="{{ route('documentaries.show', $documentary) }}" class="block no-underline">
+                  <a href="{{ $showUrl }}" class="block no-underline">
                       <div class="aspect-[16/10] relative overflow-hidden bg-gray-100 dark:bg-gray-800">
-                          @if($documentary->thumbnail)
-                              <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="{{ $documentary->title }}" loading="lazy" 
+                          @if($imageUrl)
+                              <img src="{{ $imageUrl }}" alt="{{ $doc->title }}" loading="lazy" 
                                    class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition duration-1000 grayscale-[20%] group-hover:grayscale-0">
                           @else
                               <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-black/40"></div>
@@ -76,7 +81,7 @@
                           
                           <!-- Pulse Badge -->
                           <div class="absolute top-6 left-6 flex items-center gap-3">
-                              @if($documentary->published_at && $documentary->published_at->greaterThanOrEqualTo(now()->subDays(7)))
+                              @if($doc->published_at && $doc->published_at->greaterThanOrEqualTo(now()->subDays(7)))
                               <span class="flex h-3 w-3">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
@@ -90,25 +95,25 @@
     
                       <div class="p-8">
                           <div class="flex items-center gap-3 mb-5">
-                              <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">{{ $documentary->categoryData->name ?? 'Documentary' }}</span>
+                              <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">{{ $doc->categoryData->name ?? 'Documentary' }}</span>
                               <div class="w-1 h-1 bg-gray-300 dark:bg-white/20 rounded-full"></div>
-                              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ number_format($documentary->views) }} Views</span>
+                              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ number_format($doc->views) }} Views</span>
                           </div>
 
                           <h3 class="text-2xl font-black text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-[1.1] mb-6 tracking-tighter">
-                              {{ $documentary->title }}
+                              {{ $doc->title }}
                           </h3>
 
                           <div class="flex items-center justify-between pt-6 border-t border-gray-50 dark:border-white/5">
                               <div class="flex items-center gap-3">
-                                  @if($documentary->author)
+                                  @if($doc->author)
                                   <div class="w-6 h-6 rounded-full bg-purple-600/10 flex items-center justify-center text-[10px] font-black text-purple-600 dark:text-purple-400">
-                                      {{ strtoupper(substr($documentary->author->name, 0, 1)) }}
+                                      {{ strtoupper(substr($doc->author->name, 0, 1)) }}
                                   </div>
-                                  <span class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">{{ $documentary->author->name }}</span>
+                                  <span class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">{{ $doc->author->name }}</span>
                                   @endif
                               </div>
-                              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">{{ $documentary->published_at->diffForHumans() }}</span>
+                              <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">{{ $doc->published_at ? $doc->published_at->diffForHumans() : 'Upcoming' }}</span>
                           </div>
                       </div>
                   </a>

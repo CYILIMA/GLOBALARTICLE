@@ -38,14 +38,15 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
 
             const form = this;
+            const wrapper = document.getElementById('subscribeFormWrapper');
             const btn = document.getElementById('subBtn');
             const btnText = btn.querySelector('.btn-text');
             const btnLoader = btn.querySelector('.btn-loader');
             const msgDiv = document.getElementById('subMessage');
 
             // Reset state
-            msgDiv.style.display = 'none';
-            msgDiv.className = 'subscribe-message';
+            msgDiv.classList.add('hidden');
+            msgDiv.classList.remove('msg-success', 'msg-error');
             btn.disabled = true;
             btnText.style.display = 'none';
             btnLoader.style.display = 'inline-block';
@@ -64,20 +65,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const data = await response.json();
 
-                msgDiv.style.display = 'block';
                 if (response.ok) {
-                    msgDiv.textContent = data.message || 'Subscribed successfully!';
-                    msgDiv.classList.add('msg-success');
-                    form.reset();
+                    // Success: Hide form and show message
+                    wrapper.style.opacity = '0';
+                    setTimeout(() => {
+                        wrapper.classList.add('hidden');
+                        msgDiv.textContent = data.message || 'Welcome to the circle! 🚀';
+                        msgDiv.classList.remove('hidden');
+                        msgDiv.classList.add('msg-success');
+                    }, 300);
                 } else {
-                    msgDiv.textContent = data.message || (data.errors ? Object.values(data.errors)[0][0] : 'Subscription failed.');
+                    // Error: Keep form and show error with shake
+                    msgDiv.textContent = data.message || (data.errors ? Object.values(data.errors)[0][0] : 'Something went wrong.');
+                    msgDiv.classList.remove('hidden');
                     msgDiv.classList.add('msg-error');
+
+                    // Reset button
+                    btn.disabled = false;
+                    btnText.style.display = 'inline-block';
+                    btnLoader.style.display = 'none';
+
+                    // Remove shake after animation completes to allow re-triggering
+                    setTimeout(() => {
+                        msgDiv.classList.remove('msg-error');
+                        void msgDiv.offsetWidth; // Trigger reflow
+                        msgDiv.classList.add('msg-error');
+                    }, 10);
                 }
             } catch (error) {
-                msgDiv.style.display = 'block';
-                msgDiv.textContent = 'Something went wrong. Please try again.';
+                msgDiv.textContent = 'Connection lost. Please try again later.';
+                msgDiv.classList.remove('hidden');
                 msgDiv.classList.add('msg-error');
-            } finally {
                 btn.disabled = false;
                 btnText.style.display = 'inline-block';
                 btnLoader.style.display = 'none';
