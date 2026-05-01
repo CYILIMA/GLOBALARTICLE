@@ -1,6 +1,6 @@
 {{-- Sidebar Component --}}
 <aside class="sidebar">
-    <h3>Recent Headlines</h3>
+    <h3 class="theme-strong-text">Recent Headlines</h3>
     <ul id="latestNews">
         @forelse($sidebarLatest ?? [] as $latest)
             <li>

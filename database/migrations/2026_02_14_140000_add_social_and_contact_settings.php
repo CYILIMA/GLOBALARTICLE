@@ -20,7 +20,7 @@ return new class extends Migration
             ['key' => 'social_whatsapp', 'value' => 'https://whatsapp.com', 'type' => 'string', 'group' => 'social', 'description' => 'WhatsApp URL', 'created_at' => now(), 'updated_at' => now()],
 
             // Contact Info
-            ['key' => 'contact_email', 'value' => 'contact@globalarticles.com', 'type' => 'string', 'group' => 'contact', 'description' => 'Contact Email Address', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'contact_email', 'value' => 'globalbreakings@gmail.com', 'type' => 'string', 'group' => 'contact', 'description' => 'Contact Email Address', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'contact_phone', 'value' => '+250796306573', 'type' => 'string', 'group' => 'contact', 'description' => 'Contact Phone Number', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'contact_address', 'value' => 'Kigali, Rwanda', 'type' => 'string', 'group' => 'contact', 'description' => 'Physical Address', 'created_at' => now(), 'updated_at' => now()],
         ]);

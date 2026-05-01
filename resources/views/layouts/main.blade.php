@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GLOBAL ARTICLES | Breaking & Latest News</title>
+  <title>GLOBAL BREAKINGS | Breaking & Latest News</title>
   <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- CSS FILE -->
   <link rel="stylesheet" href="{{ asset('css/CSSONLY.css') }}?v={{ time() }}">
-  
+
   <!-- Tailwind CSS Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -44,16 +44,16 @@
 
 <header>
   <div class="top-bar">
-    <div class="logo" onclick="window.location='{{ url('/') }}'">GLOBAL <span>ARTICLES</span></div>
-    
+    <div class="logo" onclick="window.location='{{ url('/') }}'">GLOBAL <span>BREAKINGS</span></div>
+
     <nav class="desktop-nav">
       <ul>
-        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/') }}" class="theme-nav-link {{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
             @foreach($globalCategories->where('slug', '!=', 'documentary')->take(7) as $cat)
                 <li>
-                    <a href="{{ url('/?category=' . $cat->slug) }}" 
-                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
+                    <a href="{{ url('/?category=' . $cat->slug) }}"
+                       class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
                        {{ strtoupper($cat->name) }}
                     </a>
                 </li>
@@ -61,11 +61,11 @@
 
             @if($globalCategories->count() > 7)
                 <li class="nav-dropdown">
-                    <a href="#" class="nav-dropdown-trigger">MORE ▾</a>
+                    <a href="#" class="nav-dropdown-trigger theme-nav-link">MORE</a>
                     <div class="nav-dropdown-content">
                         @foreach($globalCategories->where('slug', '!=', 'documentary')->skip(7) as $cat)
                             <a href="{{ url('/?category=' . $cat->slug) }}"
-                               class="{{ request('category') == $cat->slug ? 'text-blue-600' : '' }}">
+                               class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
                                 {{ $cat->name }}
                             </a>
                         @endforeach
@@ -73,8 +73,8 @@
                 </li>
             @endif
             <li>
-                <a href="{{ route('documentaries.index') }}" 
-                   class="{{ request()->routeIs('documentaries.*') ? 'active' : '' }}">
+                <a href="{{ route('documentaries.index') }}"
+                   class="theme-nav-link {{ request()->routeIs('documentaries.*') ? 'active' : '' }}">
                    DOCUMENTARY
                 </a>
             </li>
@@ -95,12 +95,12 @@
     <nav id="mobileNav">
       <div class="close-btn" onclick="toggleMenu()">✕</div>
       <ul>
-        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/') }}" class="theme-nav-link {{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
             @foreach($globalCategories as $cat)
                 <li>
-                    <a href="{{ url('/?category=' . $cat->slug) }}" 
-                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
+                    <a href="{{ url('/?category=' . $cat->slug) }}"
+                       class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
                        {{ strtoupper($cat->name) }}
                     </a>
                 </li>
@@ -153,8 +153,8 @@
 <footer>
   <div class="subscribe-container" id="subscribeSection">
     <div id="subscribeFormWrapper">
-      <h3>Subscribe for instant breaking news</h3>
-      <p class="subscribe-subtitle mb-8 text-gray-400">Join our growing community getting the latest global news in their inbox.</p>
+      <h3 class="theme-strong-text">Subscribe for instant breaking news</h3>
+      <p class="subscribe-subtitle">Join our growing community getting the latest global news in their inbox.</p>
       <form id="subscribeForm" action="{{ route('subscribe') }}" method="POST">
           @csrf
           <div class="subscribe-wrapper">
@@ -171,7 +171,7 @@
   </div>
   <div class="footer-grid">
     <div class="footer-col">
-      <div class="logo footer-logo">GLOBAL <span>ARTICLES</span></div>
+      <div class="logo footer-logo">GLOBAL <span>BREAKINGS</span></div>
       <p class="footer-description">
         Your trusted source for breaking news, in-depth analysis, and perspective from around the globe.
         Committed to truth and transparency.
@@ -200,15 +200,15 @@
         <a href="#">Privacy Policy</a>
         <div class="contact-info">
             @if(isset($globalSettings['contact_email']))
-            <a href="mailto:{{ $globalSettings['contact_email'] }}">
+            <a href="mailto:{{ $globalSettings['contact_email'] }}" class="contact-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/></svg>
-                {{ $globalSettings['contact_email'] }}
+                <span>{{ $globalSettings['contact_email'] }}</span>
             </a>
             @endif
             @if(isset($globalSettings['contact_phone']))
-            <a href="tel:{{ $globalSettings['contact_phone'] }}">
+            <a href="tel:{{ $globalSettings['contact_phone'] }}" class="contact-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/></svg>
-                {{ $globalSettings['contact_phone'] }}
+                <span>{{ $globalSettings['contact_phone'] }}</span>
             </a>
             @endif
         </div>
@@ -216,9 +216,7 @@
   </div>
 
   <div class="footer-bottom">
-    <div class="container text-center">
-      <p>&copy; {{ date('Y') }} {{ \App\Models\Setting::get('site_name', 'Global Articles') }}.</p>
-    </div>
+    <p>@Global Breakings. All rights reserved 2026</p>
   </div>
 </footer>
 

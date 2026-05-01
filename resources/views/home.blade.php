@@ -8,9 +8,9 @@
           @if(isset($category))
               <h2>Category: {{ ucfirst($category) }}</h2>
           @else
-              <h2>Latest News</h2>
+              <h2 class="theme-strong-text">Latest News</h2>
           @endif
-    
+
           @forelse($news as $item)
             <div class="news-card">
                 @if($item->image)
@@ -19,11 +19,11 @@
                     </a>
                 @endif
                 <div class="news-content">
-                    <a href="{{ route('home', ['category' => $item->category]) }}" class="category-link"><small>{{ $item->category }}</small></a>
+                    <a href="{{ route('home', ['category' => $item->category]) }}" class="category-link theme-strong-link"><small>{{ $item->category }}</small></a>
                     <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                     <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                     <div style="margin-top: 10px; font-size: 13px; color: #555;">
-                        By {{ $item->author->name ?? \App\Models\Setting::get('site_name', 'Global Articles') }} &bull; {{ $item->created_at->diffForHumans() }}
+                        By {{ $item->author->name ?? \App\Models\Setting::get('site_name', 'Global Breakings') }} &bull; {{ $item->created_at->diffForHumans() }}
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
             </div>
           @endforelse
       </section>
-    
+
       <!-- SIDEBAR -->
       @include('partials.sidebar')
   </div>
@@ -57,7 +57,7 @@
                   </div>
               </a>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 px-4">
               @foreach($documentaries as $doc)
                 @php
@@ -69,12 +69,12 @@
                   <a href="{{ $showUrl }}" class="block no-underline">
                       <div class="aspect-[16/10] relative overflow-hidden bg-gray-100 dark:bg-gray-800">
                           @if($imageUrl)
-                              <img src="{{ $imageUrl }}" alt="{{ $doc->title }}" loading="lazy" 
+                              <img src="{{ $imageUrl }}" alt="{{ $doc->title }}" loading="lazy"
                                    class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition duration-1000 grayscale-[20%] group-hover:grayscale-0">
                           @else
                               <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-black/40"></div>
                           @endif
-                          
+
                           <!-- Overlay with Play Icon -->
                           <div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
                           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
@@ -82,7 +82,7 @@
                                   <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                               </div>
                           </div>
-                          
+
                           <!-- Pulse Badge -->
                           <div class="absolute top-6 left-6 flex items-center gap-3">
                               @if($doc->published_at && $doc->published_at->greaterThanOrEqualTo(now()->subDays(7)))
@@ -96,7 +96,7 @@
                               @endif
                           </div>
                       </div>
-    
+
                       <div class="p-8">
                           <div class="flex items-center gap-3 mb-5">
                               <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">{{ $doc->categoryData->name ?? 'Documentary' }}</span>

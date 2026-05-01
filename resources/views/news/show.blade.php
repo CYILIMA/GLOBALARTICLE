@@ -16,7 +16,7 @@
             </a>
             <span class="article-meta-separator">&bull;</span>
             <span class="article-meta-author">
-                By {{ $news->author->name ?? 'Global Articles Editor' }}
+                By {{ $news->author->name ?? 'Global Breakings Editor' }}
             </span>
             <span class="article-meta-separator">&bull;</span>
             <time datetime="{{ $news->published_at ?? $news->created_at }}" class="article-meta-time">
@@ -40,18 +40,18 @@
                     <p class="{{ $index === 0 ? 'article-intro' : '' }}">
                         {!! $block['data']['text'] ?? '' !!}
                     </p>
-                    
+
                 @elseif($block['type'] === 'header')
                     @if($block['data']['level'] == 2)
                         <h2 class="article-heading-2">{{ $block['data']['text'] ?? '' }}</h2>
                     @elseif($block['data']['level'] == 3)
                         <h3 class="article-heading-3">{{ $block['data']['text'] ?? '' }}</h3>
                     @endif
-                    
+
                 @elseif($block['type'] === 'image')
                     <figure class="article-figure">
-                        <img src="{{ $block['data']['file']['url'] ?? '' }}" 
-                             alt="{{ $block['data']['caption'] ?? '' }}" 
+                        <img src="{{ $block['data']['file']['url'] ?? '' }}"
+                             alt="{{ $block['data']['caption'] ?? '' }}"
                              class="article-figure-image">
                         @if(!empty($block['data']['caption']))
                             <figcaption class="article-figcaption">
@@ -59,7 +59,7 @@
                             </figcaption>
                         @endif
                     </figure>
-                    
+
                 @elseif($block['type'] === 'quote')
                     <blockquote class="article-quote">
                         <p>{{ $block['data']['text'] ?? '' }}</p>

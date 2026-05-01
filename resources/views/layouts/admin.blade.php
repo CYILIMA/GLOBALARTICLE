@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
 
-    <title>Admin Dashboard | Global Articles</title>
+    <title>Admin Dashboard | Global Breakings</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
 
     <!-- Fonts -->
@@ -15,7 +15,7 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <style>
         :root {
             /* LIGHT MODE DEFAULT */
@@ -117,7 +117,7 @@
             color: var(--text-main);
             transition: background 0.3s;
         }
-        
+
         /* Tailwind Fixes */
         .dark .bg-white { background-color: #1f2937 !important; color: #fff; }
         .dark .text-gray-900 { color: #f3f4f6 !important; }
@@ -168,7 +168,7 @@
         <div class="p-6 text-xl font-bold border-b" style="border-color: var(--border-color)">
             GLOBAL <span class="text-blue-600 dark:text-blue-400">{{ auth()->user()->role === 'admin' ? 'ADMIN' : 'ARTICLES' }}</span>
         </div>
-        
+
         <div class="sidebar-nav">
             <nav class="mt-6">
                 <!-- MAIN SECTION -->
@@ -249,15 +249,15 @@
                     </button>
 
                     <!-- Sidebar Drawer Backdrop -->
-                    <div x-show="open" 
+                    <div x-show="open"
                          x-transition:enter="transition opacity-100 ease-out duration-300"
                          x-transition:leave="transition opacity-0 ease-in duration-200"
-                         @click="open = false" 
+                         @click="open = false"
                          class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
                          style="display: none;"></div>
 
                     <!-- Sidebar Drawer Panel -->
-                    <div x-show="open" 
+                    <div x-show="open"
                          x-transition:enter="transition transform ease-out duration-300"
                          x-transition:enter-start="-translate-x-full"
                          x-transition:enter-end="translate-x-0"
@@ -266,7 +266,7 @@
                          x-transition:leave-end="-translate-x-full"
                          class="fixed left-0 top-0 bottom-0 w-[420px] bg-white dark:bg-[#0f172a] shadow-[0_0_50px_rgba(0,0,0,0.2)] z-[70] flex flex-col border-r border-gray-100 dark:border-slate-800"
                          style="display: none;">
-                        
+
                          <!-- Header -->
                         <div class="p-8 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50/30 dark:bg-slate-900/40 backdrop-blur-md">
                             <div class="flex items-center gap-4">
@@ -283,7 +283,7 @@
                         <!-- Quick Actions -->
                         <div class="px-8 py-3 bg-white dark:bg-slate-900 border-b border-gray-50 dark:border-slate-800/50 flex justify-between items-center">
                              <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-500">Recent Notifications</span>
-                             <button @click="markAllAsRead()" 
+                             <button @click="markAllAsRead()"
                                      class="text-[10px] font-bold uppercase tracking-widest text-indigo-500 hover:text-indigo-600 transition-all flex items-center gap-2 group"
                                      :class="unreadCount === 0 ? 'opacity-50 cursor-not-allowed' : ''"
                                      :disabled="unreadCount === 0 || loading">
@@ -304,19 +304,19 @@
                                     </div>
                                 </div>
                             </template>
-                            
+
                             <div class="divide-y divide-gray-50 dark:divide-slate-800/40">
                                 <template x-for="notif in notifications" :key="notif.id">
-                                    <div @click="handleNotificationClick(notif)" 
+                                    <div @click="handleNotificationClick(notif)"
                                          class="p-6 hover:bg-gray-50 dark:hover:bg-slate-800/30 cursor-pointer transition-all relative group"
                                          :class="notif.read_at ? 'opacity-50' : 'bg-indigo-50/20 dark:bg-indigo-500/5'">
-                                        
+
                                         <!-- Unread Indicator Dot -->
-                                        <div x-show="!notif.read_at" 
+                                        <div x-show="!notif.read_at"
                                              class="absolute left-4 top-8 w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
 
                                         <div class="flex items-start gap-4">
-                                            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105" 
+                                            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
                                                  :class="notif.read_at ? 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500' : 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'"
                                                  x-html="getIcon(notif.type)">
                                             </div>
@@ -335,7 +335,7 @@
 
                         <!-- Footer -->
                         <div class="p-8 bg-gray-50/30 dark:bg-slate-900/40 backdrop-blur-md border-t border-gray-100 dark:border-slate-800">
-                            <a href="{{ route('admin.notifications.index') }}" 
+                            <a href="{{ route('admin.notifications.index') }}"
                                class="flex items-center justify-center gap-3 py-3.5 rounded-2xl bg-white dark:bg-slate-900 shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 text-[11px] font-bold uppercase tracking-widest transition-all hover:-translate-y-0.5 text-gray-600 dark:text-slate-300 group">
                                 View full activity log
                                 <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
@@ -343,7 +343,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- SECURITY SECTION -->
                 @if(auth()->user()->role === 'admin')
                 <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
@@ -356,7 +356,7 @@
                     📋 Activity Logs
                 </a>
                 @endif
-                
+
                 <!-- SYSTEM SECTION -->
                 @if(in_array(auth()->user()->role, ['admin', 'editor']))
                 <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
@@ -393,7 +393,7 @@
                 @yield('header')
             </h2>
         </div>
-        
+
         <div class="flex items-center gap-6">
             <!-- Theme Toggle -->
             <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition" title="Toggle Theme">
@@ -412,7 +412,7 @@
                 </button>
 
                 <!-- Dropdown Menu -->
-                <div x-show="open" 
+                <div x-show="open"
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="transform opacity-0 scale-95"
                      x-transition:enter-end="transform opacity-100 scale-100"
@@ -421,7 +421,7 @@
                      x-transition:leave-end="transform opacity-0 scale-95"
                      class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 border border-gray-100 dark:border-gray-700"
                      style="display: none;">
-                    
+
                     <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
                         <p class="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>
                         <p class="text-sm font-semibold truncate">{{ Auth::user()->email }}</p>
@@ -491,12 +491,12 @@
                 notifications: [],
                 unreadCount: 0,
                 loading: false,
-                
+
                 init() {
                     this.loadUnreadCount();
                     setInterval(() => this.loadUnreadCount(), 30000);
                 },
-                
+
                 async loadUnreadCount() {
                     try {
                         const response = await fetch('{{ route("admin.notifications.unread-count") }}');
@@ -506,7 +506,7 @@
                         console.error('Failed to load unread count:', error);
                     }
                 },
-                
+
                 async loadNotifications() {
                     try {
                         const response = await fetch('{{ route("admin.notifications.recent") }}?count=15');
@@ -515,7 +515,7 @@
                         console.error('Failed to load notifications:', error);
                     }
                 },
-                
+
                 async markAsRead(id) {
                     try {
                         const response = await fetch(`{{ url('/notifications') }}/${id}/read`, {
@@ -526,7 +526,7 @@
                                 'Accept': 'application/json'
                             }
                         });
-                        
+
                         if (response.ok) {
                             this.loadUnreadCount();
                             this.loadNotifications();
@@ -556,7 +556,7 @@
                         window.location.href = fallbacks[notif.type];
                     }
                 },
-                
+
                 async markAllAsRead() {
                     if (this.loading) return;
                     this.loading = true;
@@ -569,7 +569,7 @@
                                 'Accept': 'application/json'
                             }
                         });
-                        
+
                         if (response.ok) {
                             this.unreadCount = 0;
                             await Promise.all([
@@ -583,7 +583,7 @@
                         this.loading = false;
                     }
                 },
-                
+
                 getIcon(type) {
                     const icons = {
                         'comment': `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>`,
@@ -594,12 +594,12 @@
                     };
                     return icons[type] || `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`;
                 },
-                
+
                 formatTime(timestamp) {
                     const date = new Date(timestamp);
                     const now = new Date();
                     const diff = Math.floor((now - date) / 1000);
-                    
+
                     if (diff < 60) return 'Just now';
                     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
                     if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;

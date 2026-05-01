@@ -6,11 +6,11 @@
         <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
                 <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">Team Members</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage administrators, editors, and authors who contribute to Global Articles.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage administrators, editors, and authors who contribute to Global Breakings.</p>
             </div>
 
-            <a href="{{ route('admin.users.create') }}" 
-               style="background: var(--primary);" 
+            <a href="{{ route('admin.users.create') }}"
+               style="background: var(--primary);"
                onmouseover="this.style.background='var(--primary-hover)'"
                onmouseout="this.style.background='var(--primary)'"
                class="text-white text-sm font-bold py-2.5 px-6 rounded-lg transition flex items-center gap-2 shadow-md hover:shadow-lg">
