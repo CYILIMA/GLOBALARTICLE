@@ -11,13 +11,9 @@
         </h1>
 
         <div class="article-meta">
-            <a href="{{ route('home', ['category' => $news->category]) }}" class="article-category-link">
-                {{ $news->category }}
+            <a href="{{ route('home', ['category' => $news->categoryData->slug ?? Str::slug($news->category)]) }}" class="article-category-link">
+                {{ $news->categoryData->name ?? $news->category }}
             </a>
-            <span class="article-meta-separator">&bull;</span>
-            <span class="article-meta-author">
-                By {{ $news->author->name ?? 'Global Breakings Editor' }}
-            </span>
             <span class="article-meta-separator">&bull;</span>
             <time datetime="{{ $news->published_at ?? $news->created_at }}" class="article-meta-time">
                 {{ ($news->published_at ?? $news->created_at)->format('F d, Y • h:i A') }}
@@ -27,7 +23,25 @@
         @if($news->image)
             <figure class="article-image-container">
                 <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="article-image">
+                @if($news->image_source)
+                    <figcaption class="article-image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">Image source: {{ $news->image_source }}</figcaption>
+                @endif
             </figure>
+        @endif
+
+        @if($news->author)
+            <div class="article-author-card">
+                <a href="{{ route('authors.show', $news->author) }}" class="article-author-link-card">
+                    @if($news->author->profile_image)
+                        <img src="{{ asset('storage/' . $news->author->profile_image) }}" alt="{{ $news->author->name }}" class="article-author-image">
+                    @else
+                        <span class="article-author-avatar">{{ strtoupper(substr($news->author->name, 0, 1)) }}</span>
+                    @endif
+                    <div class="article-author-details">
+                        <span class="article-author-name">{{ $news->author->name }}</span>
+                    </div>
+                </a>
+            </div>
         @endif
     </header>
 
@@ -67,6 +81,12 @@
                             <cite>{{ $block['data']['caption'] }}</cite>
                         @endif
                     </blockquote>
+                @elseif($block['type'] === 'link')
+                    <div class="article-link-block">
+                        <a href="{{ $block['data']['url'] ?? '#' }}" target="_blank" rel="noopener noreferrer">
+                            {{ $block['data']['text'] ?? 'Read more' }}
+                        </a>
+                    </div>
                 @endif
             @endforeach
         @else

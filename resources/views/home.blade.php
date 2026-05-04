@@ -19,7 +19,7 @@
                     </a>
                 @endif
                 <div class="news-content">
-                    <a href="{{ route('home', ['category' => $item->category]) }}" class="category-link theme-strong-link"><small>{{ $item->category }}</small></a>
+                    <a href="{{ route('home', ['category' => $item->categoryData->slug ?? Str::slug($item->category)]) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name ?? $item->category }}</small></a>
                     <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                     <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                     <div style="margin-top: 10px; font-size: 13px; color: #555;">

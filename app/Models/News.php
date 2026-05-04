@@ -18,6 +18,7 @@ class News extends Model
         'category_id', // New relation
         'user_id', // Author relation
         'image',
+        'image_source',
         'breaking',
         'status',
         'published_at',

@@ -12,15 +12,15 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <div class="rounded-xl shadow-sm border p-8 space-y-6 transition-colors" style="background: var(--sidebar-bg); border-color: var(--border-color)">
                 <!-- Name -->
                 <div>
                     <label for="name" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Full Name</label>
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required 
-                           class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all" 
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                           class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
                            style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)"
                            placeholder="Enter name...">
                     @error('name') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
@@ -29,8 +29,8 @@
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Email Address</label>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" required 
-                           class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all" 
+                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                           class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
                            style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)"
                            placeholder="user@globalarticles.com">
                     @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
@@ -40,7 +40,7 @@
                     <!-- Role -->
                     <div>
                         <label for="role" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Role Permissions</label>
-                        <select name="role" id="role" required 
+                        <select name="role" id="role" required
                                 class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
                                 style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)">
                             <option value="author" {{ old('role') == 'author' ? 'selected' : '' }}>Author</option>
@@ -49,6 +49,23 @@
                         </select>
                         <p class="mt-2 text-[10px] uppercase tracking-widest font-bold" style="color: var(--text-sidebar)">Select the appropriate access level.</p>
                     </div>
+
+                    <!-- Profile Image -->
+                    <div>
+                        <label for="profile_image" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Profile Image</label>
+                        <input type="file" name="profile_image" id="profile_image" accept="{{ \App\Support\AllowedImageUploads::acceptAttribute() }}"
+                               class="w-full rounded-lg shadow-sm transition-all"
+                               style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)">
+                        @error('profile_image') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                <div>
+                    <label for="profile_description" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Author Bio</label>
+                    <textarea name="profile_description" id="profile_description" rows="4"
+                              class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
+                              style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main)">{{ old('profile_description') }}</textarea>
+                    @error('profile_description') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 transition-colors" style="border-color: var(--border-color)">
@@ -56,10 +73,10 @@
                     <div>
                         <label for="password" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Initial Password</label>
                         <div style="position: relative;">
-                            <input type="password" name="password" id="password" required 
+                            <input type="password" name="password" id="password" required
                                    class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
                                    style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main); padding-right: 48px; border-width: 1px;">
-                            <button type="button" onclick="togglePassword('password')" 
+                            <button type="button" onclick="togglePassword('password')"
                                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; display: flex; align-items: center;"
                                     class="text-gray-500 hover:text-gray-300 transition-colors">
                                 <svg id="password_eye" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,10 +92,10 @@
                     <div>
                         <label for="password_confirmation" class="block text-sm font-bold mb-2" style="color: var(--text-main)">Confirm Password</label>
                         <div style="position: relative;">
-                            <input type="password" name="password_confirmation" id="password_confirmation" required 
+                            <input type="password" name="password_confirmation" id="password_confirmation" required
                                    class="w-full rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all"
                                    style="background: var(--content-bg); border-color: var(--border-color); color: var(--text-main); padding-right: 48px; border-width: 1px;">
-                            <button type="button" onclick="togglePassword('password_confirmation')" 
+                            <button type="button" onclick="togglePassword('password_confirmation')"
                                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; display: flex; align-items: center;"
                                     class="text-gray-500 hover:text-gray-300 transition-colors">
                                 <svg id="password_confirmation_eye" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,7 +123,7 @@
             const field = document.getElementById(fieldId);
             const isPassword = field.getAttribute('type') === 'password';
             field.setAttribute('type', isPassword ? 'text' : 'password');
-            
+
             // Toggle eye icon path (cross through the eye or solid eye)
             const eyePath = document.getElementById(fieldId + '_eye_path');
             if (isPassword) {
@@ -121,8 +138,8 @@
     <style>
         /* Force dark background for autocomplete */
         input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
         input:-webkit-autofill:active{
             -webkit-box-shadow: 0 0 0 30px #000 inset !important;
             -webkit-text-fill-color: #fff !important;

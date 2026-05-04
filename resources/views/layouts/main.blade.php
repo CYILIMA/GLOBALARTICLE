@@ -44,7 +44,11 @@
 
 <header>
   <div class="top-bar">
-    <div class="logo" onclick="window.location='{{ url('/') }}'">GLOBAL <span>BREAKINGS</span></div>
+    <div class="logo" onclick="window.location='{{ url('/') }}'">
+      <img src="{{ asset('images/logo1.png') }}" alt="Global Breakings" class="logo-icon">
+      <span class="logo-main">GLOBAL</span>
+      <span class="logo-highlight">BREAKINGS</span>
+    </div>
 
     <nav class="desktop-nav">
       <ul>
@@ -154,7 +158,7 @@
   <div class="subscribe-container" id="subscribeSection">
     <div id="subscribeFormWrapper">
       <h3 class="theme-strong-text">Subscribe for instant breaking news</h3>
-      <p class="subscribe-subtitle">Join our growing community getting the latest global news in their inbox.</p>
+      <p class="subscribe-subtitle">Join our growing community getting the latest global news in your inbox.</p>
       <form id="subscribeForm" action="{{ route('subscribe') }}" method="POST">
           @csrf
           <div class="subscribe-wrapper">
@@ -170,13 +174,18 @@
     <div id="subMessage" class="subscribe-message hidden"></div>
   </div>
   <div class="footer-grid">
-    <div class="footer-col">
-      <div class="logo footer-logo">GLOBAL <span>BREAKINGS</span></div>
+    <div class="footer-col footer-branding">
+      <a href="{{ url('/') }}" class="footer-logo footer-logo-link">
+          <span class="footer-logo-main">GLOBAL</span>
+          <span class="footer-logo-highlight">BREAKINGS</span>
+      </a>
       <p class="footer-description">
         Your trusted source for breaking news, in-depth analysis, and perspective from around the globe.
         Committed to truth and transparency.
       </p>
-      @include('partials.social-icons')
+      <div class="footer-social-group">
+        @include('partials.social-icons')
+      </div>
 
     </div>
 
@@ -195,9 +204,9 @@
 
     <div class="footer-col">
         <h4>Company & Support</h4>
-        <a href="#">About Us</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#">Privacy Policy</a>
+        <a href="{{ route('about') }}">About Us</a>
+        <a href="{{ route('terms') }}">Terms & Conditions</a>
+        <a href="{{ route('privacy') }}">Privacy Policy</a>
         <div class="contact-info">
             @if(isset($globalSettings['contact_email']))
             <a href="mailto:{{ $globalSettings['contact_email'] }}" class="contact-link">

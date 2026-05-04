@@ -15,19 +15,19 @@
 
         <form action="{{ route('news.store') }}" method="POST" enctype="multipart/form-data" id="articleForm">
             @csrf
-            
+
             <!-- Hidden field for block content -->
             <input type="hidden" name="content_blocks" id="content_blocks">
             <input type="hidden" name="content_version" value="v2">
 
             <!-- MAIN CONTENT -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-6">
-                
+
                 <!-- Title -->
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Article Title</label>
-                    <input type="text" name="title" id="title" required 
-                           class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white text-lg font-medium" 
+                    <input type="text" name="title" id="title" required
+                           class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white text-lg font-medium"
                            placeholder="Enter a catchy title...">
                 </div>
 
@@ -35,7 +35,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
-                        <select name="category_id" id="category_id" required 
+                        <select name="category_id" id="category_id" required
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
                             <option value="">Select a Category...</option>
                             @foreach($categories as $category)
@@ -45,7 +45,7 @@
                     </div>
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                        <select name="status" id="status" required 
+                        <select name="status" id="status" required
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
                             <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft (Save for later)</option>
                             @if(auth()->user()->role !== 'author')
@@ -62,7 +62,7 @@
                     </div>
                     <div>
                         <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Author</label>
-                        <select name="user_id" id="user_id" required 
+                        <select name="user_id" id="user_id" required
                                 {{ auth()->user()->role === 'author' ? 'disabled' : '' }}
                                 class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white {{ auth()->user()->role === 'author' ? 'bg-gray-50 opacity-75' : '' }}">
                             @foreach($authors as $author)
@@ -84,6 +84,7 @@
                         Use the block editor below to structure your article. The first paragraph will automatically be styled as an introduction.
                     </p>
                     <div id="editorjs" style="min-height: 400px;" class="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg shadow-inner"></div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">You can insert inline links directly inside paragraphs using the link tool, or use the dedicated link block for stand-alone calls to action.</p>
                 </div>
             </div>
 
@@ -95,12 +96,19 @@
                 <div>
                     <label for="image" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Article Thumbnail</label>
                     <div class="relative group">
-                        <input type="file" name="image" id="image" accept="image/*" 
+                        <input type="file" name="image" id="image" accept="{{ \App\Support\AllowedImageUploads::acceptAttribute() }}"
                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition dark:file:bg-gray-700 dark:file:text-gray-300 cursor-pointer">
                     </div>
                     <div class="mt-2 flex flex-col gap-1">
                         <p class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">Recommended: 1200x630px (Landscape)</p>
                         <p class="text-[10px] text-orange-500/80 dark:text-orange-400/80 font-bold italic">Max size: 20MB. For larger images, please compress before uploading.</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="image_source" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Image Source / Credit</label>
+                        <input type="text" name="image_source" id="image_source" value="{{ old('image_source') }}"
+                               class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Optional. Use this field to acknowledge the thumbnail image source or author.</p>
                     </div>
                 </div>
 
@@ -109,7 +117,7 @@
                 <div class="flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50 flex-col">
                     <div class="flex items-center gap-2">
                         <div class="flex items-center h-5">
-                            <input name="breaking" id="breaking" type="checkbox" value="1" 
+                            <input name="breaking" id="breaking" type="checkbox" value="1"
                                    class="focus:ring-red-500 h-4 w-4 text-red-600 border-gray-300 rounded dark:bg-gray-900 dark:border-gray-600">
                         </div>
                         <div class="ml-1 text-sm">
@@ -117,12 +125,12 @@
                             <p class="text-red-600 dark:text-red-400/80 text-xs">Sends email to all subscribers immediately.</p>
                         </div>
                     </div>
-                    
+
                     <div class="w-full pl-6">
                         <label for="breaking_expires_at" class="block text-xs font-medium text-red-800 dark:text-red-400 mb-1">Expires At (Optional)</label>
-                        <input type="datetime-local" name="breaking_expires_at" id="breaking_expires_at" 
+                        <input type="datetime-local" name="breaking_expires_at" id="breaking_expires_at"
                                class="w-full border-red-200 dark:border-red-800/50 dark:bg-gray-900 rounded shadow-sm text-sm text-gray-700 dark:text-gray-300 focus:ring-red-500 focus:border-red-500">
-                        <p class="text-xs text-gray-400 mt-1">Leave empty to default to 24 hours.</p>
+                        <p class="text-xs text-gray-400 mt-1">Leave empty to keep breaking news active until it is manually unchecked.</p>
                     </div>
                 </div>
             </div>
@@ -162,9 +170,56 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.7.0?v={{ time() }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.8.1?v={{ time() }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.5.0?v={{ time() }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@2.4.0"></script>
 
-    <!-- Article Editor Initialization -->
     <script>
+    class ArticleLinkTool {
+        static get toolbox() {
+            return {
+                title: 'Link',
+                icon: ''
+            };
+        }
+
+        constructor({ data }) {
+            this.data = data || { text: '', url: '' };
+            this.wrapper = document.createElement('div');
+            this.wrapper.classList.add('cdx-block');
+        }
+
+        render() {
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.placeholder = 'Enter link text';
+            textInput.value = this.data.text || '';
+            textInput.className = 'cdx-input';
+
+            const urlInput = document.createElement('input');
+            urlInput.type = 'url';
+            urlInput.placeholder = 'Enter link URL';
+            urlInput.value = this.data.url || '';
+            urlInput.className = 'cdx-input mt-2';
+
+            this.textInput = textInput;
+            this.urlInput = urlInput;
+
+            this.wrapper.appendChild(textInput);
+            this.wrapper.appendChild(urlInput);
+            return this.wrapper;
+        }
+
+        save() {
+            return {
+                text: this.textInput.value.trim(),
+                url: this.urlInput.value.trim()
+            };
+        }
+
+        validate(savedData) {
+            return savedData.text && savedData.url;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         let editor; // Declare globally within this scope
 
@@ -172,7 +227,7 @@
         // Initialize Editor.js
         editor = new EditorJS({ // Assign to outer variable
             holder: 'editorjs',
-            
+
             // Load old content if validation failed, otherwise start empty
             data: @if(old('content_blocks')) {!! old('content_blocks') !!} @else {
                 blocks: [
@@ -184,10 +239,13 @@
                     }
                 ]
             } @endif,
-            
+
             autofocus: true,
-            
+
             tools: {
+                paragraph: {
+                    inlineToolbar: true
+                },
                 header: {
                     class: Header,
                     config: {
@@ -196,7 +254,7 @@
                         defaultLevel: 2
                     }
                 },
-                
+
                 image: {
                     class: ImageTool,
                     config: {
@@ -212,7 +270,7 @@
                         }
                     }
                 },
-                
+
                 quote: {
                     class: Quote,
                     inlineToolbar: true,
@@ -220,9 +278,13 @@
                         quotePlaceholder: 'Enter a quote',
                         captionPlaceholder: 'Quote author (optional)'
                     }
+                },
+                linkTool: LinkTool,
+                link: {
+                    class: ArticleLinkTool,
                 }
             },
-            
+
             placeholder: 'Start writing your article...',
             minHeight: 300,
         });
@@ -230,11 +292,11 @@
         console.error('Error initializing Editor.js:', error);
         alert('Error loading editor: ' + error.message);
     }
-    
+
     // Handle form submission
     document.getElementById('articleForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         if (!editor) {
             alert('Editor not initialized properly');
             return;
@@ -243,7 +305,7 @@
         try {
             // Save editor content
             const outputData = await editor.save();
-            
+
             // Validate that all images have captions
             const imageBlocks = outputData.blocks.filter(block => block.type === 'image');
             for (let img of imageBlocks) {
@@ -252,15 +314,15 @@
                     return;
                 }
             }
-            
+
             // Mark first paragraph as intro
             if (outputData.blocks.length > 0 && outputData.blocks[0].type === 'paragraph') {
                 outputData.blocks[0].data.isIntro = true;
             }
-            
+
             // Set the hidden field value
             document.getElementById('content_blocks').value = JSON.stringify(outputData);
-            
+
             // Submit the form
             this.submit();
         } catch (error) {

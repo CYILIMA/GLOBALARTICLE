@@ -61,9 +61,14 @@ class CommentController extends Controller
             \App\Services\NotificationService::newComment($admin->id, $comment, $news);
         }
 
-        // Notify Author if the commenter is not the author themselves
-        if ($news->user_id && $news->user_id !== auth()->id()) {
+        // Notify Author if the commenter is not the author themselves and the author was not already notified as an admin
+        if ($news->user_id && $news->user_id !== auth()->id() && !$admins->contains('id', $news->user_id)) {
             \App\Services\NotificationService::newComment($news->user_id, $comment, $news);
+        }
+
+        // Notify the commenter if they are logged in
+        if (auth()->check()) {
+            \App\Services\NotificationService::commentSubmitted(auth()->id(), $comment, $news);
         }
 
         return back()->with('success', 'Your comment has been submitted and is awaiting moderation.');

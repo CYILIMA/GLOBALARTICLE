@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Documentary;
 use App\Models\ActivityLog;
+use App\Support\AllowedImageUploads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,7 +46,7 @@ class DocumentaryManagementController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'content' => 'required|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'thumbnail' => AllowedImageUploads::rules(maxKilobytes: 2048),
             'video_url' => 'nullable|url',
             'status' => 'required|in:draft,published,pending',
         ]);
@@ -106,7 +107,7 @@ class DocumentaryManagementController extends Controller
             'category_id' => 'required|exists:categories,id',
             'description' => 'required|string',
             'content' => 'required|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'thumbnail' => AllowedImageUploads::rules(maxKilobytes: 2048),
             'video_url' => 'nullable|url',
             'status' => 'required|in:draft,published,pending',
         ]);
@@ -132,7 +133,9 @@ class DocumentaryManagementController extends Controller
             'thumbnail' => $thumbnailPath,
             'video_url' => $request->video_url,
             'status' => $finalStatus,
-            'published_at' => $finalStatus == 'published' && !$documentary->published_at ? now() : $documentary->published_at,
+            'published_at' => $finalStatus === 'published'
+                ? ($documentary->status === 'published' ? $documentary->published_at : now())
+                : null,
         ]);
 
         // Notify Admins if newly Pending

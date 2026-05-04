@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Models\User;
+use App\Support\AllowedImageUploads;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class NewsController extends Controller
 {
@@ -16,10 +19,12 @@ class NewsController extends Controller
             })
             ->latest();
 
-        // Filter by category slug if provided
-        if ($request->has('category')) {
-            $query->whereHas('categoryData', function($q) use ($request) {
-                $q->where('slug', $request->category);
+        // Filter by category slug or name if provided
+        if ($request->filled('category')) {
+            $categoryFilter = $request->category;
+            $query->whereHas('categoryData', function($q) use ($categoryFilter) {
+                $q->where('slug', $categoryFilter)
+                  ->orWhere('name', $categoryFilter);
             });
         }
 
@@ -37,7 +42,7 @@ class NewsController extends Controller
             ->with('author')
             ->take(6)
             ->get();
-            
+
         $newsDocs = \App\Models\News::published()
             ->whereHas('categoryData', function($q) {
                 $q->where('slug', 'documentary');
@@ -84,6 +89,18 @@ class NewsController extends Controller
         return view('news.show', compact('news', 'relatedNews', 'sidebarLatest'));
     }
 
+    public function showAuthor(User $author)
+    {
+        $articles = News::published()
+            ->where('user_id', $author->id)
+            ->latest()
+            ->paginate(12);
+
+        $sidebarLatest = News::published()->latest()->take(5)->get();
+
+        return view('authors.show', compact('author', 'articles', 'sidebarLatest'));
+    }
+
     public function create()
     {
         $categories = \App\Models\Category::all();
@@ -99,7 +116,8 @@ class NewsController extends Controller
             'content_blocks' => 'nullable|json', // New block-based content
             'content_version' => 'nullable|in:v1,v2',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'image' => AllowedImageUploads::rules(),
+            'image_source' => 'nullable|string|max:255',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
             'published_at' => 'nullable|date',
@@ -115,11 +133,8 @@ class NewsController extends Controller
 
         $category = \App\Models\Category::find($request->category_id);
 
-        // Default expiration to 24h if breaking is checked but no date provided
-        $expiresAt = $request->breaking_expires_at;
-        if ($request->has('breaking') && !$expiresAt) {
-            $expiresAt = now()->addHours(24);
-        }
+        // Keep breaking news active until manually unset. Use expires_at only to end breaking status automatically.
+        $expiresAt = $request->has('breaking') ? $request->breaking_expires_at : null;
 
 
         $news = News::create([
@@ -131,6 +146,7 @@ class NewsController extends Controller
             'category' => $category->name, // Keeping legacy string for backward compatibility
             'user_id' => $request->user_id ?? auth()->id(), // Set requested user or current user
             'image' => $imagePath,
+            'image_source' => $request->image_source,
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
             'status' => $request->status,
@@ -142,7 +158,7 @@ class NewsController extends Controller
         // Enforcement of publishing rights for Authors
         if ($news->status === 'published' && auth()->user()->role === 'author') {
             $news->update(['status' => 'pending', 'published_at' => null]);
-            
+
             // Notify ALL Admins
             $admins = \App\Models\User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
@@ -162,8 +178,8 @@ class NewsController extends Controller
             }
         }
 
-        $message = auth()->user()->role === 'author' 
-            ? 'Article submitted successfully and is awaiting administrator approval.' 
+        $message = auth()->user()->role === 'author'
+            ? 'Article submitted successfully and is awaiting administrator approval.'
             : 'News article created successfully!';
 
         return redirect()->route('admin.news.index')->with('success', $message);
@@ -180,12 +196,13 @@ class NewsController extends Controller
     public function update(Request $request, News $news)
     {
         $this->authorize('update', $news);
-        
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'image' => AllowedImageUploads::rules(),
+            'image_source' => 'nullable|string|max:255',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
             'published_at' => 'nullable|date',
@@ -205,11 +222,8 @@ class NewsController extends Controller
 
         $category = \App\Models\Category::find($request->category_id);
 
-        // Default expiration to 24h if breaking is checked but no date provided
-        $expiresAt = $request->breaking_expires_at;
-        if ($request->has('breaking') && !$expiresAt) {
-            $expiresAt = now()->addHours(24);
-        }
+        // Keep breaking news active until manually unset. Use expires_at only to end breaking status automatically.
+        $expiresAt = $request->has('breaking') ? $request->breaking_expires_at : null;
 
         $oldStatus = $news->status;
 
@@ -222,6 +236,7 @@ class NewsController extends Controller
             'category' => $category->name,
             'user_id' => $request->user_id ?? ($news->user_id ?? auth()->id()), // Maintain, change, or set author
             'image' => $imagePath,
+            'image_source' => $request->image_source,
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
             'status' => $request->status,
@@ -233,7 +248,7 @@ class NewsController extends Controller
         // Enforcement for authors
         if ($news->status === 'published' && auth()->user()->role === 'author') {
             $news->update(['status' => 'pending', 'published_at' => null]);
-            
+
             // Notify Admins
             $admins = \App\Models\User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
@@ -247,7 +262,7 @@ class NewsController extends Controller
         }
 
         $message = auth()->user()->role === 'author' && $news->status !== 'published'
-            ? 'Article updated and remains in review/draft status.' 
+            ? 'Article updated and remains in review/draft status.'
             : 'News article updated successfully!';
 
         return redirect()->route('admin.news.index')->with('success', $message);
@@ -263,19 +278,19 @@ class NewsController extends Controller
         $news->delete();
         return redirect()->route('admin.news.index')->with('success', 'News article deleted successfully!');
     }
-    
+
     /**
      * Upload article image for Editor.js
      */
     public function uploadArticleImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:20480'
+            'image' => AllowedImageUploads::rules(required: true)
         ]);
-        
+
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('article_images', 'public');
-            
+
             return response()->json([
                 'success' => 1,
                 'file' => [
@@ -283,7 +298,7 @@ class NewsController extends Controller
                 ]
             ]);
         }
-        
+
         return response()->json([
             'success' => 0,
             'message' => 'No image uploaded'

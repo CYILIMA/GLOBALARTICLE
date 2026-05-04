@@ -101,7 +101,25 @@ class NotificationService
             [
                 'comment_id' => $comment->id,
                 'article_id' => $article->id,
-                'link' => route('news.show', $article->slug) . '#comment-' . $comment->id
+                'link' => route('news.show', $article) . '#comment-' . $comment->id
+            ]
+        );
+    }
+
+    /**
+     * Notify commenter that their comment has been submitted successfully
+     */
+    public static function commentSubmitted($userId, $comment, $article)
+    {
+        return self::create(
+            $userId,
+            'comment_submitted',
+            'Comment Submitted',
+            "Your comment on \"{$article->title}\" has been submitted and will be approved shortly.",
+            [
+                'comment_id' => $comment->id,
+                'article_id' => $article->id,
+                'link' => route('news.show', $article)
             ]
         );
     }

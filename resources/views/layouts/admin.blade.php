@@ -447,8 +447,9 @@
     <main class="admin-content">
         <!-- Flash Messages -->
         @if (session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 dark:bg-green-900 dark:text-green-100 rounded shadow-sm" role="alert">
+            <div id="success-flash" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 dark:bg-green-900 dark:text-green-100 rounded shadow-sm relative" role="alert">
                 <p>{{ session('success') }}</p>
+                <button id="success-flash-close" type="button" class="absolute top-3 right-3 text-green-700 dark:text-green-100 hover:text-green-900" aria-label="Dismiss notification">×</button>
             </div>
         @endif
 
@@ -480,6 +481,14 @@
                 themeIcon.textContent = '🌙';
             }
         });
+
+        const successFlash = document.getElementById('success-flash');
+        if (successFlash) {
+            const closeBtn = document.getElementById('success-flash-close');
+            const hideFlash = () => successFlash.remove();
+            closeBtn?.addEventListener('click', hideFlash);
+            setTimeout(hideFlash, 6000);
+        }
     </script>
     @stack('scripts')
 
