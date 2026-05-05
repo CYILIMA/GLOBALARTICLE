@@ -107,5 +107,18 @@ document.addEventListener('DOMContentLoaded', function () {
 // Mobile Menu Toggle
 function toggleMenu() {
     const nav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('navOverlay');
+    const isOpening = !nav.classList.contains('active');
+
     nav.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = isOpening ? 'hidden' : '';
 }
+
+// Close nav on Escape key
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        const nav = document.getElementById('mobileNav');
+        if (nav.classList.contains('active')) toggleMenu();
+    }
+});

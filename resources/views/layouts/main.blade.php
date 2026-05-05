@@ -95,20 +95,36 @@
         <!-- Hamburger -->
         <div class="hamburger" onclick="toggleMenu()">☰</div>
     </div>
-     <!-- Mobile Nav -->
+    <!-- Mobile Nav Overlay -->
+    <div id="navOverlay" onclick="toggleMenu()"></div>
+
+    <!-- Mobile Nav Drawer -->
     <nav id="mobileNav">
-      <div class="close-btn" onclick="toggleMenu()">✕</div>
+      <div class="mobile-nav-header">
+        <a href="{{ url('/') }}" class="mobile-nav-logo">
+          <img src="{{ asset('images/logo1.png') }}" alt="Logo" class="logo-icon">
+          <span class="logo-main">GLOBAL</span>
+          <span class="logo-highlight">BREAKINGS</span>
+        </a>
+        <div class="close-btn" onclick="toggleMenu()">✕</div>
+      </div>
       <ul>
-        <li><a href="{{ url('/') }}" class="theme-nav-link {{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
             @foreach($globalCategories as $cat)
                 <li>
                     <a href="{{ url('/?category=' . $cat->slug) }}"
-                       class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
+                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
                        {{ strtoupper($cat->name) }}
                     </a>
                 </li>
             @endforeach
+            <li>
+                <a href="{{ route('documentaries.index') }}"
+                   class="{{ request()->routeIs('documentaries.*') ? 'active' : '' }}">
+                   DOCUMENTARY
+                </a>
+            </li>
         @endif
       </ul>
     </nav>

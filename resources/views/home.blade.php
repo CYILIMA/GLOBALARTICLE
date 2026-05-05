@@ -41,24 +41,24 @@
 
   <!-- DOCUMENTARY SECTION (Full Width Breakout) -->
   @if($documentaries->count() > 0)
-  <section id="documentaryArea" class="mt-0 py-20 border-t border-gray-100 dark:border-white/5 w-full bg-white dark:bg-[#0a0a0a]">
+  <section id="documentaryArea" class="mt-0 py-10 md:py-20 border-t border-gray-100 dark:border-white/5 w-full bg-white dark:bg-[#0a0a0a]">
       <div class="max-w-7xl mx-auto">
-          <div class="flex items-end justify-between mb-16 px-4">
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 md:mb-16 px-4 gap-4">
               <div>
-                  <span class="inline-block px-3 py-1 bg-purple-600/10 text-purple-600 dark:text-purple-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-md mb-4">
+                  <span class="inline-block px-3 py-1 bg-purple-600/10 text-purple-600 dark:text-purple-400 text-[10px] font-black uppercase tracking-[0.2em] rounded-md mb-3">
                       Cinematic Discovery
                   </span>
-                  <h2 class="text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none">Documentaries</h2>
+                  <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-none">Documentaries</h2>
               </div>
-              <a href="{{ route('documentaries.index') }}" class="group flex items-center gap-3 text-[11px] font-black text-gray-400 hover:text-purple-600 transition-colors uppercase tracking-widest">
+              <a href="{{ route('documentaries.index') }}" class="group flex items-center gap-2 text-[11px] font-black text-gray-400 hover:text-purple-600 transition-colors uppercase tracking-widest self-start sm:self-auto">
                   View Full Library
-                  <div class="w-8 h-8 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center group-hover:border-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                      <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                  <div class="w-7 h-7 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center group-hover:border-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                      <svg class="w-3 h-3 text-inherit" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                   </div>
               </a>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 px-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-10 px-4">
               @foreach($documentaries as $doc)
                 @php
                     $isNews = $doc instanceof \App\Models\News;
@@ -97,7 +97,7 @@
                           </div>
                       </div>
 
-                      <div class="p-8">
+                      <div class="p-4 sm:p-6 md:p-8">
                           <div class="flex items-center gap-3 mb-5">
                               <span class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">{{ $doc->categoryData->name ?? 'Documentary' }}</span>
                               <div class="w-1 h-1 bg-gray-300 dark:bg-white/20 rounded-full"></div>
