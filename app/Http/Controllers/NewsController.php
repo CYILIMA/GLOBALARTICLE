@@ -123,7 +123,8 @@ class NewsController extends Controller
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'breaking_expires_at' => 'nullable|date',
+            'breaking_duration'      => 'nullable|integer|min:1|max:8760',
+            'breaking_duration_unit' => 'nullable|in:hours,days',
         ]);
 
         $imagePath = null;
@@ -133,8 +134,18 @@ class NewsController extends Controller
 
         $category = \App\Models\Category::find($request->category_id);
 
-        // Keep breaking news active until manually unset. Use expires_at only to end breaking status automatically.
-        $expiresAt = $request->has('breaking') ? $request->breaking_expires_at : null;
+        if ($request->has('breaking')) {
+            if ($request->filled('breaking_duration')) {
+                $duration  = (int) $request->breaking_duration;
+                $expiresAt = $request->breaking_duration_unit === 'days'
+                    ? now()->addDays($duration)
+                    : now()->addHours($duration);
+            } else {
+                $expiresAt = now()->addHours(24);
+            }
+        } else {
+            $expiresAt = null;
+        }
 
 
         $news = News::create([
@@ -208,7 +219,8 @@ class NewsController extends Controller
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'breaking_expires_at' => 'nullable|date',
+            'breaking_duration'      => 'nullable|integer|min:1|max:8760',
+            'breaking_duration_unit' => 'nullable|in:hours,days',
         ]);
 
         $imagePath = $news->image;
@@ -222,8 +234,21 @@ class NewsController extends Controller
 
         $category = \App\Models\Category::find($request->category_id);
 
-        // Keep breaking news active until manually unset. Use expires_at only to end breaking status automatically.
-        $expiresAt = $request->has('breaking') ? $request->breaking_expires_at : null;
+        if ($request->has('breaking')) {
+            if ($request->filled('breaking_duration')) {
+                $duration  = (int) $request->breaking_duration;
+                $expiresAt = $request->breaking_duration_unit === 'days'
+                    ? now()->addDays($duration)
+                    : now()->addHours($duration);
+            } else {
+                // Keep existing future expiry; otherwise default to 24 hours from now
+                $expiresAt = ($news->breaking_expires_at && $news->breaking_expires_at->isFuture())
+                    ? $news->breaking_expires_at
+                    : now()->addHours(24);
+            }
+        } else {
+            $expiresAt = null;
+        }
 
         $oldStatus = $news->status;
 

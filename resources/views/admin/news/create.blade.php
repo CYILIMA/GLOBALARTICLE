@@ -126,11 +126,19 @@
                         </div>
                     </div>
 
-                    <div class="w-full pl-6">
-                        <label for="breaking_expires_at" class="block text-xs font-medium text-red-800 dark:text-red-400 mb-1">Expires At (Optional)</label>
-                        <input type="datetime-local" name="breaking_expires_at" id="breaking_expires_at"
-                               class="w-full border-red-200 dark:border-red-800/50 dark:bg-gray-900 rounded shadow-sm text-sm text-gray-700 dark:text-gray-300 focus:ring-red-500 focus:border-red-500">
-                        <p class="text-xs text-gray-400 mt-1">Leave empty to keep breaking news active until it is manually unchecked.</p>
+                    <div class="w-full pl-6 space-y-2">
+                        <label class="block text-xs font-medium text-red-800 dark:text-red-400">Duration (Optional)</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="number" name="breaking_duration" id="breaking_duration"
+                                   min="1" max="8760" value="{{ old('breaking_duration') }}" placeholder="24"
+                                   class="w-24 border-red-200 dark:border-red-800/50 dark:bg-gray-900 rounded shadow-sm text-sm text-gray-700 dark:text-gray-300 focus:ring-red-500 focus:border-red-500">
+                            <select name="breaking_duration_unit" id="breaking_duration_unit"
+                                    class="border-red-200 dark:border-red-800/50 dark:bg-gray-900 rounded shadow-sm text-sm text-gray-700 dark:text-gray-300 focus:ring-red-500 focus:border-red-500">
+                                <option value="hours" {{ old('breaking_duration_unit', 'hours') === 'hours' ? 'selected' : '' }}>Hours</option>
+                                <option value="days"  {{ old('breaking_duration_unit') === 'days'  ? 'selected' : '' }}>Days</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-gray-400">Leave empty to default to <strong>24 hours</strong>.</p>
                     </div>
                 </div>
             </div>

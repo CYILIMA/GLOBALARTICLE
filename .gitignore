@@ -1,1 +1,66 @@
-node_modules
+# PHP dependencies
+/vendor
+
+# Node dependencies
+/node_modules
+
+# Environment & secrets
+.env
+.env.backup
+.env.production
+.env.staging
+
+# Laravel runtime & cache
+/bootstrap/cache/*.php
+/storage/*.key
+.phpunit.result.cache
+/.phpunit.cache
+
+# Build artifacts
+/public/build
+/public/hot
+/public/storage
+
+# Uploaded user files (use cloud storage in production)
+/storage/app/public/article_images/
+/storage/app/public/news_images/
+/storage/app/public/assets/
+
+# Local SQLite database
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# Composer binary (use system-installed composer)
+composer.phar
+
+# Logs
+*.log
+/storage/logs/
+
+# Markdown files
+*.md
+
+# Debug & temporary files
+route_output.txt
+
+# IDE & editor
+.cursor/
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# AI / agent tooling
+.agents/
+.jetro/
+.mcp.json
+.windsurfrules
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local data (datasets, stocks, lists — not source code)
+/data/
+/projects/
