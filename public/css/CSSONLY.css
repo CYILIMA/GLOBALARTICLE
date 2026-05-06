@@ -1010,6 +1010,7 @@ footer {
     color: var(--text-main);
     font-size: 26px;
     cursor: pointer;
+    flex-shrink: 0;
   }
   .logo {
     font-size: 20px;
@@ -1071,7 +1072,18 @@ footer {
     height: 24px;
   }
   .hamburger {
-    font-size: 24px;
+    font-size: 22px;
+  }
+  .header-right {
+    gap: 6px;
+  }
+  .theme-toggle-btn {
+    font-size: 13px;
+    width: 24px;
+    height: 24px;
+  }
+  .logo-main {
+    display: none;
   }
   .container {
     grid-template-columns: 1fr;
@@ -1158,9 +1170,6 @@ footer {
 
 /* --- Extra small phones --- */
 @media (max-width: 480px) {
-  .logo-main {
-    display: none;
-  }
   .logo {
     font-size: 16px;
     gap: 5px;
@@ -1926,13 +1935,17 @@ footer {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 20px;
-  padding: 5px;
+  font-size: 18px;
+  padding: 0;
   color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.3s;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .theme-toggle-btn:hover {

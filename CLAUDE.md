@@ -27,11 +27,12 @@ Sign in to access skills. Call `jet.skill({ name: "Skill Name" })` after authent
 ## Available Templates
 
 To use a template, call `jet_template({ name: "Template Name" })` to fetch the full content.
+
 <!-- cloude-code-toolbox:mcp-skills-awareness-begin -->
 
 ### MCP & Skills awareness (Cloude Code ToolBox)
 
-_Last synced: 2026-05-05T20:06:57.320Z._
+_Last synced: 2026-05-06T16:49:53.252Z._
 
 - **Full report:** `.claude/cloude-code-toolbox-mcp-skills-awareness.md` in this workspace (auto-overwritten on each scan). Use it as ground truth for configured servers and skill folders.
 - **MCP:** For **live tools** in Claude Code, enable the matching server via `/mcp` (and VS Code `mcp.json` where applicable).
