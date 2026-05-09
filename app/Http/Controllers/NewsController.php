@@ -150,6 +150,7 @@ class NewsController extends Controller
 
         $news = News::create([
             'title' => $request->title,
+            'slug'  => News::generateSlug($request->title),
             'content' => $request->content ?? '', // Fallback for v2 blocks
             'content_blocks' => json_decode($request->content_blocks, true),
             'content_version' => $request->content_version ?? 'v1',
@@ -254,6 +255,7 @@ class NewsController extends Controller
 
         $news->update([
             'title' => $request->title,
+            'slug'  => $news->slug ?: News::generateSlug($request->title, $news->id),
             'content' => $request->content ?? '', // Fallback for v2 blocks
             'content_blocks' => json_decode($request->content_blocks, true),
             'content_version' => $request->content_version ?? $news->content_version,

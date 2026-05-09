@@ -27,6 +27,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Public news routes (wildcard must come after specific routes)
 Route::get('/author/{author}', [NewsController::class, 'showAuthor'])->name('authors.show');
+
+// SEO: redirect old numeric IDs to slug-based URLs (301 permanent for crawlers)
+Route::get('/news/{id}', function ($id) {
+    $news = \App\Models\News::find($id);
+    abort_if(!$news || !$news->slug, 404);
+    return redirect()->route('news.show', $news->slug, 301);
+})->where('id', '[0-9]+')->name('news.show.legacy');
+
 Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
 
 Route::get('/documentaries', [DocumentaryController::class, 'index'])->name('documentaries.index');

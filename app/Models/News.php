@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class News extends Model
 {
@@ -11,6 +12,7 @@ class News extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'content',
         'content_blocks', // JSON block data
         'content_version', // v1=HTML, v2=blocks
@@ -63,5 +65,29 @@ class News extends Model
     public function getTitleAttribute($value)
     {
         return preg_replace('/\s\(\d+\)$/', '', $value);
+    }
+
+    // Laravel uses this column instead of `id` for route model binding
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    // Generate a unique slug, optionally excluding a given news id (for updates)
+    public static function generateSlug(string $title, ?int $excludeId = null): string
+    {
+        $base  = Str::slug($title) ?: 'article';
+        $slug  = $base;
+        $count = 2;
+
+        while (
+            static::where('slug', $slug)
+                ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+                ->exists()
+        ) {
+            $slug = $base . '-' . $count++;
+        }
+
+        return $slug;
     }
 }
