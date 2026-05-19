@@ -15,7 +15,17 @@ class CommentController extends Controller
             'author_name' => 'required|string|max:100',
             'author_email' => 'required|email|max:255',
             'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|integer|exists:comments,id',
         ]);
+
+        $parentComment = null;
+        if ($request->filled('parent_id')) {
+            $parentComment = Comment::where('id', $request->parent_id)
+                ->where('news_id', $news->id)
+                ->whereNull('parent_id')
+                ->approved()
+                ->firstOrFail();
+        }
 
         // Check if commenter is blocked
         $isBlocked = DB::table('blocked_commenters')
@@ -46,6 +56,7 @@ class CommentController extends Controller
 
         $comment = Comment::create([
             'news_id' => $news->id,
+            'parent_id' => $parentComment?->id,
             'author_name' => $request->author_name,
             'author_email' => $request->author_email,
             'content' => $request->content,
@@ -71,6 +82,10 @@ class CommentController extends Controller
             \App\Services\NotificationService::commentSubmitted(auth()->id(), $comment, $news);
         }
 
-        return back()->with('success', 'Your comment has been submitted and is awaiting moderation.');
+        $message = $parentComment
+            ? 'Your reply was sent. It is being reviewed and will be approved as soon as possible.'
+            : 'Your comment was sent. It is being reviewed and will be approved as soon as possible.';
+
+        return back()->with('success', $message);
     }
 }

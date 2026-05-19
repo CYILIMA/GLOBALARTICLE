@@ -40,7 +40,7 @@
     }
   </script>
 </head>
-<body>
+<body class="@if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0) has-breaking-banner @elseif(session('success')) has-success-banner @endif">
 
 <header>
   <div class="top-bar">
@@ -65,8 +65,8 @@
 
             @if($globalCategories->count() > 7)
                 <li class="nav-dropdown">
-                    <a href="#" class="nav-dropdown-trigger theme-nav-link">MORE</a>
-                    <div class="nav-dropdown-content">
+                    <button type="button" class="nav-dropdown-trigger theme-nav-link" aria-expanded="false" aria-controls="moreCategoriesMenu">MORE</button>
+                    <div class="nav-dropdown-content" id="moreCategoriesMenu">
                         @foreach($globalCategories->where('slug', '!=', 'documentary')->skip(7) as $cat)
                             <a href="{{ url('/?category=' . $cat->slug) }}"
                                class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
@@ -165,6 +165,32 @@
   </div>
   @endif
 </header>
+
+@if(session('success') || session('error') || $errors->any())
+  <div id="siteToast" class="site-toast {{ session('error') || $errors->any() ? 'site-toast-error' : 'site-toast-success' }}" role="status" aria-live="polite">
+    <strong>{{ session('error') || $errors->any() ? 'Please check this' : 'Submitted' }}</strong>
+    <span>
+      @if(session('success'))
+        {{ session('success') }}
+      @elseif(session('error'))
+        {{ session('error') }}
+      @else
+        {{ $errors->first() }}
+      @endif
+    </span>
+  </div>
+  <script>
+    window.setTimeout(function () {
+      const toast = document.getElementById('siteToast');
+      if (toast) {
+        toast.classList.add('site-toast-hide');
+        window.setTimeout(function () {
+          toast.remove();
+        }, 300);
+      }
+    }, 5000);
+  </script>
+@endif
 
 <main class="@yield('main_class', 'container')">
     @yield('content')

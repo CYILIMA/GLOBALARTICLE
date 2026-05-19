@@ -31,7 +31,12 @@ Route::get('/author/{author}', [NewsController::class, 'showAuthor'])->name('aut
 // SEO: redirect old numeric IDs to slug-based URLs (301 permanent for crawlers)
 Route::get('/news/{id}', function ($id) {
     $news = \App\Models\News::find($id);
-    abort_if(!$news || !$news->slug, 404);
+    abort_if(!$news, 404);
+
+    if (!$news->slug) {
+        $news->save();
+    }
+
     return redirect()->route('news.show', $news->slug, 301);
 })->where('id', '[0-9]+')->name('news.show.legacy');
 

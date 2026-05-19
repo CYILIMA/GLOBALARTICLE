@@ -3,7 +3,7 @@
 @section('main_class', 'home-main')
 
 @section('content')
-  <div class="container">
+  <div class="container {{ request()->filled('category') ? 'category-layout' : '' }}">
       <section id="newsArea">
           @if(isset($category))
               <h2>Category: {{ ucfirst($category) }}</h2>
@@ -13,16 +13,14 @@
 
           @forelse($news as $item)
             <div class="news-card">
-                @if($item->image)
-                    <a href="{{ route('news.show', $item) }}">
-                        <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" loading="lazy">
-                    </a>
-                @endif
+                <a href="{{ route('news.show', $item) }}" class="news-thumbnail">
+                    <img src="{{ $item->image ? asset('storage/' . $item->image) : asset('images/logo1.png') }}" alt="{{ $item->title }}" loading="lazy">
+                </a>
                 <div class="news-content">
                     <a href="{{ route('home', ['category' => $item->categoryData->slug ?? Str::slug($item->category)]) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name ?? $item->category }}</small></a>
                     <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                     <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
-                    <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                    <div class="news-meta">
                         By {{ $item->author->name ?? \App\Models\Setting::get('site_name', 'Global Breakings') }} &bull; {{ $item->created_at->diffForHumans() }}
                     </div>
                 </div>

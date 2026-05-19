@@ -11,6 +11,7 @@ class Comment extends Model
 
     protected $fillable = [
         'news_id',
+        'parent_id',
         'author_name',
         'author_email',
         'content',
@@ -28,6 +29,16 @@ class Comment extends Model
     public function news()
     {
         return $this->belongsTo(News::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Comment::class, 'parent_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
     }
 
     // Scopes

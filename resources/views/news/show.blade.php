@@ -24,7 +24,7 @@
             <figure class="article-image-container">
                 <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="article-image">
                 @if($news->image_source)
-                    <figcaption class="article-image-caption text-sm text-gray-500 dark:text-gray-400 mt-2">Image source: {{ $news->image_source }}</figcaption>
+                    <figcaption class="article-image-caption">Image source: {{ $news->image_source }}</figcaption>
                 @endif
             </figure>
         @endif
@@ -123,7 +123,7 @@
 
         <!-- Approved Comments -->
         <div class="comments-list">
-            @forelse($news->comments()->approved()->latest()->get() as $comment)
+            @forelse($news->comments()->approved()->whereNull('parent_id')->with(['replies' => fn($query) => $query->approved()->oldest()])->latest()->get() as $comment)
                 <div class="comment-card">
                     <div class="comment-header">
                         <div class="comment-avatar">
@@ -135,6 +135,47 @@
                         </div>
                     </div>
                     <p class="comment-content">{{ $comment->content }}</p>
+                    <details class="reply-panel">
+                        <summary class="reply-toggle">Reply</summary>
+                        <form action="{{ route('comments.store', $news) }}" method="POST" class="reply-form">
+                            @csrf
+                            <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Your Name</label>
+                                    <input type="text" name="author_name" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Your Email</label>
+                                    <input type="email" name="author_email" required class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label class="form-label">Reply</label>
+                                <textarea name="content" required class="form-textarea" placeholder="Reply to {{ $comment->author_name }}..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Post Reply</button>
+                        </form>
+                    </details>
+
+                    @if($comment->replies->count() > 0)
+                        <div class="comment-replies">
+                            @foreach($comment->replies as $reply)
+                                <div class="comment-card reply-card">
+                                    <div class="comment-header">
+                                        <div class="comment-avatar">
+                                            {{ substr($reply->author_name, 0, 1) }}
+                                        </div>
+                                        <div class="comment-info">
+                                            <h4 class="comment-author">{{ $reply->author_name }}</h4>
+                                            <span class="comment-time">Reply &bull; {{ $reply->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="comment-content">{{ $reply->content }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @empty
                 <p class="empty-state">No comments yet. Be the first to comment!</p>
@@ -148,16 +189,16 @@
             <h3 class="article-section-title">More in {{ $news->category }}</h3>
             <div class="related-grid">
                 @foreach($relatedNews as $related)
-                    <a href="{{ route('news.show', $related) }}" class="related-card">
-                        @if($related->image)
-                            <div class="related-image-container">
-                                <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="related-image">
-                            </div>
-                        @endif
-                        <h4 class="related-title">
-                            {{ $related->title }}
-                        </h4>
-                        <span class="related-time">{{ $related->created_at->diffForHumans() }}</span>
+                    <a href="{{ route('news.show', $related) }}" class="related-card{{ $related->id === $news->id ? ' active' : '' }}">
+                        <div class="related-image-container">
+                            <img src="{{ $related->image ? asset('storage/' . $related->image) : asset('images/logo1.png') }}" alt="{{ $related->title }}" class="related-image">
+                        </div>
+                        <div class="related-content">
+                            <h4 class="related-title">
+                                {{ $related->title }}
+                            </h4>
+                            <span class="related-time">{{ $related->created_at->diffForHumans() }}</span>
+                        </div>
                     </a>
                 @endforeach
             </div>

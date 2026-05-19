@@ -39,6 +39,15 @@ class News extends Model
         'content_blocks' => 'array', // Cast JSON to array
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (News $news) {
+            if (! filled($news->slug)) {
+                $news->slug = static::generateSlug($news->title ?? 'article', $news->id);
+            }
+        });
+    }
+
     public function author()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -71,6 +80,20 @@ class News extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function getRouteKey()
+    {
+        return filled($this->slug) ? $this->slug : $this->getKey();
+    }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field ??= $this->getRouteKeyName();
+
+        return $this->where($field, $value)
+            ->when(is_numeric($value), fn($query) => $query->orWhere($this->getKeyName(), $value))
+            ->first();
     }
 
     // Generate a unique slug, optionally excluding a given news id (for updates)

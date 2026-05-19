@@ -102,6 +102,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Desktop "More" categories menu
+    const moreTrigger = document.querySelector('.nav-dropdown-trigger');
+    const moreDropdown = moreTrigger ? moreTrigger.closest('.nav-dropdown') : null;
+    if (moreTrigger && moreDropdown) {
+        moreTrigger.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const isOpen = moreDropdown.classList.toggle('open');
+            moreTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!moreDropdown.contains(e.target)) {
+                moreDropdown.classList.remove('open');
+                moreTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 });
 
 // Mobile Menu Toggle
@@ -120,5 +140,12 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         const nav = document.getElementById('mobileNav');
         if (nav.classList.contains('active')) toggleMenu();
+
+        const moreDropdown = document.querySelector('.nav-dropdown.open');
+        const moreTrigger = document.querySelector('.nav-dropdown-trigger');
+        if (moreDropdown) {
+            moreDropdown.classList.remove('open');
+            moreTrigger?.setAttribute('aria-expanded', 'false');
+        }
     }
 });

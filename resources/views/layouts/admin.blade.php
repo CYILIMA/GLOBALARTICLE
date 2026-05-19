@@ -66,12 +66,26 @@
             position: fixed;
             left: 0;
             top: 0;
-            transition: background 0.3s, border 0.3s;
+            transition: transform 0.3s ease, background 0.3s, border 0.3s;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            overflow-y: hidden;
+            overflow-y: auto;
+            transform: translateX(0);
             z-index: 50;
+        }
+        body.sidebar-open .admin-sidebar {
+            transform: translateX(0);
+        }
+        .mobile-sidebar-overlay {
+            display: none;
+        }
+        body.sidebar-open .mobile-sidebar-overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 45;
         }
         .sidebar-nav {
             flex: 1;
@@ -118,6 +132,86 @@
             transition: background 0.3s;
         }
 
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                width: min(320px, 80vw);
+                transform: translateX(-100%);
+                border-right: none;
+                box-shadow: 8px 0 30px rgba(0, 0, 0, 0.12);
+            }
+            .admin-header,
+            .admin-content {
+                margin-left: 0;
+            }
+            .admin-header {
+                padding: 14px 16px;
+                position: relative;
+            }
+            .admin-content {
+                padding: 18px 14px;
+                min-height: calc(100vh - 62px);
+            }
+            .admin-sidebar a {
+                padding: 14px 18px;
+            }
+            .admin-sidebar .p-6 {
+                padding: 18px 18px;
+            }
+            .mobile-menu-btn {
+                display: inline-flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 42px;
+                height: 42px;
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--button-bg);
+                color: var(--text-main);
+                z-index: 10;
+                border-radius: 9999px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                border: 1px solid var(--border-color);
+            }
+            .admin-header {
+                padding-left: 68px;
+                position: relative;
+            }
+            .admin-header .flex.items-center.gap-4 {
+                margin-left: 0;
+            }
+            .admin-sidebar {
+                height: 100vh;
+            }
+            .admin-sidebar .sidebar-nav {
+                padding-top: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .admin-sidebar {
+                width: 100vw;
+                max-width: 100%;
+            }
+            .admin-content {
+                padding: 16px 12px;
+            }
+            .admin-header {
+                padding: 12px 12px;
+            }
+            .admin-sidebar a {
+                padding: 14px 16px;
+                font-size: 0.92rem;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .mobile-menu-btn {
+                display: none !important;
+            }
+        }
+
         /* Tailwind Fixes */
         .dark .bg-white { background-color: #1f2937 !important; color: #fff; }
         .dark .text-gray-900 { color: #f3f4f6 !important; }
@@ -141,6 +235,10 @@
             transform: translateX(4px);
         }
 
+        .mobile-menu-btn {
+            border: 1px solid var(--border-color);
+        }
+
         /* Notification Drawer Styles */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -157,6 +255,61 @@
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #4b5563;
+        }
+
+        /* Compact backend typography */
+        body {
+            font-size: 13px;
+        }
+        .admin-sidebar {
+            font-size: 0.82rem;
+        }
+        .admin-sidebar a {
+            font-size: 0.78rem;
+        }
+        .admin-header h1,
+        .admin-header h2,
+        .admin-header h3 {
+            font-size: 0.95rem !important;
+        }
+        .admin-content {
+            font-size: 0.82rem;
+        }
+        .admin-content h1,
+        .admin-content h2,
+        .admin-content h3 {
+            font-size: 1rem !important;
+        }
+        .admin-content h4,
+        .admin-content h5,
+        .admin-content h6 {
+            font-size: 0.9rem !important;
+        }
+        .admin-content .text-5xl {
+            font-size: 1.95rem !important;
+        }
+        .admin-content .text-4xl {
+            font-size: 1.55rem !important;
+        }
+        .admin-content .text-3xl {
+            font-size: 1.25rem !important;
+        }
+        .admin-content .text-2xl {
+            font-size: 1.08rem !important;
+        }
+        .admin-content .text-xl {
+            font-size: 0.95rem !important;
+        }
+        .admin-content .text-lg {
+            font-size: 0.9rem !important;
+        }
+        .admin-content input,
+        .admin-content select,
+        .admin-content textarea,
+        .admin-content button,
+        .admin-content table,
+        .admin-content label {
+            font-size: 0.82rem;
         }
     </style>
 </head>
@@ -385,10 +538,19 @@
             </form>
         </div>
     </div>
+    <div id="sidebarBackdrop" class="mobile-sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- MAIN CONTENT -->
     <div class="admin-header shadow-sm">
         <div class="flex items-center gap-4">
+            <button id="sidebarToggle" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                <svg id="sidebarToggleOpenIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg id="sidebarToggleCloseIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
             <h2 class="text-xl font-semibold">
                 @yield('header')
             </h2>
@@ -457,6 +619,23 @@
     </main>
 
     <script>
+        function setSidebarIcon(open) {
+            const openIcon = document.getElementById('sidebarToggleOpenIcon');
+            const closeIcon = document.getElementById('sidebarToggleCloseIcon');
+            if (!openIcon || !closeIcon) return;
+            openIcon.classList.toggle('hidden', open);
+            closeIcon.classList.toggle('hidden', !open);
+        }
+
+        function toggleSidebar() {
+            const isOpen = document.body.classList.toggle('sidebar-open');
+            setSidebarIcon(isOpen);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setSidebarIcon(document.body.classList.contains('sidebar-open'));
+        });
+
         const toggleBtn = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
