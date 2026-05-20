@@ -39,6 +39,8 @@
       }
     }
   </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3769891956372409"
+     crossorigin="anonymous"></script>
 </head>
 <body class="@if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0) has-breaking-banner @elseif(session('success')) has-success-banner @endif">
 
