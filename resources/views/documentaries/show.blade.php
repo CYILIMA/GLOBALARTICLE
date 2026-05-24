@@ -2,6 +2,7 @@
 
 @section('title', $documentary->title)
 @section('meta_description', $documentary->description)
+@section('meta_image', $documentary->thumbnail ? asset('storage/' . $documentary->thumbnail) : asset('images/logo1.png'))
 
 @section('main_class', 'documentary-main-wrapper')
 
@@ -55,10 +56,10 @@
                         @endphp
 
                         @if($videoId)
-                            <iframe src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&autoplay=0" 
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen 
+                            <iframe src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&autoplay=0"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
                                     class="absolute inset-0 w-full h-full transition-opacity duration-700 opacity-95 group-hover:opacity-100">
                             </iframe>
                         @elseif(str_contains($documentary->video_url, 'vimeo.com'))
@@ -67,10 +68,10 @@
                                 $videoId = $matches[1] ?? null;
                             @endphp
                             @if($videoId)
-                                <iframe src="https://player.vimeo.com/video/{{ $videoId }}?color=a855f7&title=0&byline=0&portrait=0" 
-                                        frameborder="0" 
-                                        allow="autoplay; fullscreen; picture-in-picture" 
-                                        allowfullscreen 
+                                <iframe src="https://player.vimeo.com/video/{{ $videoId }}?color=a855f7&title=0&byline=0&portrait=0"
+                                        frameborder="0"
+                                        allow="autoplay; fullscreen; picture-in-picture"
+                                        allowfullscreen
                                         class="absolute inset-0 w-full h-full transition-opacity duration-700 opacity-95 group-hover:opacity-100">
                                 </iframe>
                             @endif
@@ -83,7 +84,7 @@
                     </div>
                 @elseif($documentary->thumbnail)
                     <figure class="mb-12 rounded-[2rem] overflow-hidden shadow-2xl group relative">
-                        <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="{{ $documentary->title }}" 
+                        <img src="{{ asset('storage/' . $documentary->thumbnail) }}" alt="{{ $documentary->title }}"
                              class="w-full h-auto object-cover max-h-[700px] transition-transform duration-1000 group-hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </figure>
@@ -107,7 +108,7 @@
                             <a href="{{ route('documentaries.show', $related) }}" class="group block no-underline">
                                 <div class="aspect-video rounded-3xl overflow-hidden mb-6 shadow-xl bg-gray-100 dark:bg-gray-800 relative transform transition-transform group-hover:-translate-y-2 duration-500">
                                     @if($related->thumbnail)
-                                        <img src="{{ asset('storage/' . $related->thumbnail) }}" alt="{{ $related->title }}" 
+                                        <img src="{{ asset('storage/' . $related->thumbnail) }}" alt="{{ $related->title }}"
                                              class="w-full h-full object-cover group-hover:scale-110 transition duration-1000">
                                     @else
                                         <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-indigo-600/20"></div>

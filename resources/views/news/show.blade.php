@@ -2,6 +2,7 @@
 
 @section('title', $news->meta_title ?? $news->title)
 @section('meta_description', $news->meta_description ?? Str::limit(strip_tags($news->content), 150))
+@section('meta_image', $news->image ? asset('storage/' . $news->image) : asset('images/logo1.png'))
 
 @section('content')
 <article class="article-container">

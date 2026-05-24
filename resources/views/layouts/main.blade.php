@@ -2,9 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GLOBAL BREAKINGS | Breaking & Latest News</title>
-  <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
+  <title>@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')</title>
+  <meta name="description" content="@yield('meta_description', 'Global Breakings brings you the latest breaking news from around the world.')" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta property="og:title" content="@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')" />
+  <meta property="og:description" content="@yield('meta_description', 'Global Breakings brings you the latest breaking news from around the world.')" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="{{ url()->current() }}" />
+  <meta property="og:image" content="@yield('meta_image', asset('images/logo1.png'))" />
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:title" content="@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')" />
+  <meta property="twitter:description" content="@yield('meta_description', 'Global Breakings brings you the latest breaking news from around the world.')" />
+  <meta property="twitter:image" content="@yield('meta_image', asset('images/logo1.png'))" />
 
   <!-- CSS FILE -->
   <link rel="stylesheet" href="{{ asset('css/CSSONLY.css') }}?v={{ time() }}">
