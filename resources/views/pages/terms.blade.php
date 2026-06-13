@@ -20,8 +20,13 @@
     </section>
 
     <section class="page-section">
+        <h2 style="font-weight: 700;">Advertising and third-party services</h2>
+        <p>Our site may display third-party advertisements, including Google AdSense. By using this website, you agree that such providers may collect and use information as described in our privacy policy and in accordance with their own terms.</p>
+    </section>
+
+    <section class="page-section">
         <h2 style="font-weight: 700;">Limitation of liability</h2>
-        <p>We do our best to provide accurate information, but we are not responsible for errors, omissions, or decisions made based on content published here.</p>
+        <p>We do our best to provide accurate information, but we are not responsible for errors, omissions, or decisions made based on content published here. We also do not guarantee ad performance, availability, or revenue outcomes.</p>
     </section>
 </article>
 @endsection

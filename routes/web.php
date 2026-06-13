@@ -45,6 +45,7 @@ Route::get('/news/{news}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/documentaries', [DocumentaryController::class, 'index'])->name('documentaries.index');
 Route::get('/documentaries/{documentary}', [DocumentaryController::class, 'show'])->name('documentaries.show');
 Route::get('/about', fn() => view('pages.about'))->name('about');
+Route::get('/contact', fn() => view('pages.contact'))->name('contact');
 Route::get('/terms', fn() => view('pages.terms'))->name('terms');
 Route::get('/privacy', fn() => view('pages.privacy'))->name('privacy');
 Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');

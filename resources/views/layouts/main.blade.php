@@ -259,6 +259,7 @@
     <div class="footer-col">
         <h4>Company & Support</h4>
         <a href="{{ route('about') }}">About Us</a>
+        <a href="{{ route('contact') }}">Contact Us</a>
         <a href="{{ route('terms') }}">Terms & Conditions</a>
         <a href="{{ route('privacy') }}">Privacy Policy</a>
         <div class="contact-info">

@@ -15,12 +15,22 @@
 
     <section class="page-section">
         <h2 style="font-weight: 700;">Information we collect</h2>
-        <p>We may collect information you provide directly, such as email addresses for newsletter subscriptions, as well as technical information from your visits to our site.</p>
+        <p>We may collect information you provide directly, such as email addresses for newsletter subscriptions, as well as technical information from your visits to our site, including browser type, device data, and site usage patterns.</p>
     </section>
 
     <section class="page-section">
         <h2 style="font-weight: 700;">How we use your data</h2>
-        <p>We use data to improve the site, send relevant updates, and support the services we provide. We do not sell your information to third parties.</p>
+        <p>We use data to improve the site, send relevant updates, analyze performance, and support the services we provide. We do not sell personal data to third parties. We may use trusted advertising partners, including Google AdSense, to display ads and measure ad performance.</p>
+    </section>
+
+    <section class="page-section">
+        <h2 style="font-weight: 700;">Advertising and cookies</h2>
+        <p>Our site may use advertising technologies and cookies to personalize and improve ad experiences. These technologies help us understand traffic and ad effectiveness, and they may be managed by third-party providers such as Google.</p>
+    </section>
+
+    <section class="page-section">
+        <h2 style="font-weight: 700;">Your choices</h2>
+        <p>You may manage browser settings to limit cookies or opt out of certain advertising features where supported by your browser or device. Please contact us if you want more information about how your data is handled.</p>
     </section>
 </article>
 @endsection
