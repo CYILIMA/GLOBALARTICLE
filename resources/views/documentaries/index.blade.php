@@ -61,37 +61,43 @@
                             $imageUrl = $isNews ? ($doc->image ? asset('storage/' . $doc->image) : null) : ($doc->thumbnail ? asset('storage/' . $doc->thumbnail) : null);
                         @endphp
                         
-                        <article class="group relative doc-card rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(139,92,246,0.3)]">
+                        <article class="group doc-card doc-index-card rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
                             <a href="{{ $showUrl }}" class="block no-underline">
-                                <div class="aspect-video relative overflow-hidden">
+                                <!-- Thumbnail -->
+                                <div class="doc-index-thumb">
                                     @if($imageUrl)
-                                        <img src="{{ $imageUrl }}" alt="{{ $doc->title }}" 
-                                             class="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110">
+                                        <img src="{{ $imageUrl }}" alt="{{ $doc->title }}"
+                                             class="doc-index-thumb-img">
                                     @else
-                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-gray-950 dark:to-black"></div>
-                                    @endif
-                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                                        <div class="w-16 h-16 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/20 transform scale-50 group-hover:scale-100 transition-all duration-500 shadow-2xl">
-                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        <div class="doc-index-thumb-fallback">
+                                            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:0.3">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                            </svg>
                                         </div>
+                                    @endif
+
+                                    <!-- Always-visible play badge -->
+                                    <div class="doc-index-play">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
                                     </div>
-                                    <div class="absolute top-6 left-6">
-                                        <span class="px-4 py-1.5 bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-purple-400">
-                                            {{ $doc->categoryData->name ?? 'Documentary' }}
-                                        </span>
-                                    </div>
+
+                                    <!-- Category -->
+                                    <span class="doc-index-cat">{{ $doc->categoryData->name ?? 'Documentary' }}</span>
                                 </div>
-                                
-                                <div class="p-8">
-                                    <h2 class="text-3xl font-black mb-4 leading-tight group-hover:text-purple-400 transition-colors tracking-tighter doc-title">
+
+                                <!-- Body -->
+                                <div class="p-5">
+                                    <h2 class="doc-title text-lg font-black mb-2 leading-snug tracking-tight" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
                                         {{ $doc->title }}
                                     </h2>
-                                    <p class="doc-desc text-sm font-medium mb-6 line-clamp-2 leading-relaxed">
-                                        {{ $doc->description ?? Str::limit(strip_tags($doc->content), 120) }}
+                                    <p class="doc-desc text-sm font-medium mb-4 leading-relaxed" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                        {{ $doc->description ?? Str::limit(strip_tags($doc->content), 100) }}
                                     </p>
-                                    <div class="flex items-center justify-between text-[11px] font-black doc-meta uppercase tracking-widest pt-6 border-t doc-card-divider">
+                                    <div class="flex items-center justify-between text-[11px] font-bold doc-meta uppercase tracking-widest pt-4 border-t doc-card-divider">
                                         <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                                            <span style="width:6px;height:6px;border-radius:50%;background:#7c3aed;display:inline-block;flex-shrink:0;"></span>
                                             {{ number_format($doc->views) }} Views
                                         </div>
                                         <span>{{ $doc->published_at ? $doc->published_at->format('M Y') : 'Upcoming' }}</span>
@@ -141,9 +147,82 @@
         border-color: rgba(139,92,246,0.5);
     }
     .doc-title { color: var(--text-main); }
+    .doc-title:hover { color: #7c3aed; }
     .doc-desc { color: var(--text-muted); }
     .doc-meta { color: var(--text-muted); }
     .doc-card-divider { border-color: var(--border-color); }
+
+    /* Index card thumbnail */
+    .doc-index-thumb {
+        position: relative;
+        width: 100%;
+        height: 190px;
+        overflow: hidden;
+        background: var(--border-color);
+    }
+    .doc-index-thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+    .doc-index-card:hover .doc-index-thumb-img {
+        transform: scale(1.06);
+    }
+    .doc-index-thumb-fallback {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #3b0764 0%, #1e1b4b 100%);
+        color: #a78bfa;
+    }
+
+    /* Play badge */
+    .doc-index-play {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        width: 36px;
+        height: 36px;
+        background: #7c3aed;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(124,58,237,0.5);
+        transition: transform 0.2s ease;
+        padding-left: 2px;
+    }
+    .doc-index-card:hover .doc-index-play {
+        transform: scale(1.12);
+    }
+
+    /* Category label */
+    .doc-index-cat {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #fff;
+        background: rgba(0,0,0,0.55);
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    /* Responsive grid */
+    @media (max-width: 768px) {
+        .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 {
+            gap: 14px !important;
+        }
+        .doc-index-thumb { height: 150px; }
+    }
     html.dark .doc-card-divider { border-color: rgba(255,255,255,0.05); }
     .doc-empty-state {
         background: var(--bg-card);

@@ -45,6 +45,17 @@
         @endif
     </header>
 
+    {{-- In-Article Banner Ad --}}
+    @if(!empty($globalInArticleAds))
+    <div class="ad-in-article-zone" id="adInArticle"
+         data-ads="{{ json_encode($globalInArticleAds) }}"
+         data-img-class="ad-in-article-img">
+        <span class="ad-label-tag">Advertisement</span>
+        <div class="ad-rotator-slot"></div>
+        <button class="ad-close-btn" onclick="this.closest('.ad-in-article-zone').remove()" title="Close" aria-label="Close advertisement">✕</button>
+    </div>
+    @endif
+
     <!-- Content -->
     <div class="article-content">
         @if($news->content_version === 'v2' && $news->content_blocks)

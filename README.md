@@ -278,6 +278,12 @@ The application uses **PostgreSQL exclusively**. The database name is `global_ar
 # Run all migrations
 php artisan migrate
 
+#Run it locally
+$env:PATH = "C:\xampp\php;" + $env:PATH
+cd d:\GLOBALARTICLE
+php artisan serve
+
+
 # Rollback last migration batch
 php artisan migrate:rollback
 

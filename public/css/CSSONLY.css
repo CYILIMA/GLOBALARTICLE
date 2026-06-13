@@ -2004,6 +2004,202 @@ footer {
   width: 100%;
 }
 
+/* ============================================================
+   ADVERTISEMENTS — Shared base styles
+   ============================================================ */
+
+/* "Advertisement" label — leaderboard: left-aligned */
+/* "Advertisement" label — always overlays the image so needs its own bg */
+.ad-label-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0,0,0,0.45);
+  padding: 3px 7px;
+  border-radius: 0 0 4px 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Sidebar, in-article, footer: label centered */
+.ad-sidebar-zone .ad-label-tag,
+.ad-in-article-zone .ad-label-tag,
+.ad-footer-zone .ad-label-tag {
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0 0 4px 4px;
+  white-space: nowrap;
+}
+
+/* Rotator slot — fills its parent zone completely */
+.ad-rotator-slot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.2s ease;
+}
+
+/* Dismiss animation (leaderboard + footer) */
+.ad-dismissed {
+  max-height: 0 !important;
+  opacity: 0;
+}
+
+/* Close button — visible over any image */
+.ad-close-btn {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 7px;
+  border-radius: 4px;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+.ad-close-btn:hover {
+  opacity: 1;
+  background: rgba(0,0,0,0.7);
+}
+.ad-in-article-zone .ad-close-btn { right: 8px; font-size: 12px; padding: 3px 5px; }
+.ad-footer-zone .ad-close-btn     { right: 12px; }
+
+/* Image hover dimming — shared across sidebar, in-article, footer */
+.ad-sidebar-zone a:hover .ad-sidebar-img,
+.ad-in-article-zone a:hover .ad-in-article-img,
+.ad-footer-zone a:hover .ad-footer-img {
+  opacity: 0.9;
+}
+
+/* ============================================================
+   LEADERBOARD — Header banner (full-bleed, edge-to-edge)
+   ============================================================ */
+
+.ad-leaderboard-zone {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+  transition: max-height 0.35s ease, opacity 0.35s ease;
+}
+.ad-rotator-slot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: opacity 0.2s ease;
+}
+.ad-banner-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.ad-banner-link:hover { opacity: 0.92; }
+.ad-banner-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (max-width: 768px) {
+  .ad-leaderboard-zone { height: 140px; }
+  .ad-label-tag { display: none; }
+}
+@media (max-width: 480px) {
+  .ad-leaderboard-zone { height: 90px; }
+}
+
+/* ============================================================
+   SIDEBAR — Rectangle ad
+   ============================================================ */
+
+.ad-sidebar-zone {
+  position: relative;
+  margin-top: 24px;
+  width: 100%;
+  max-width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  padding-top: 20px;
+}
+.ad-sidebar-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.2s ease;
+}
+@media (max-width: 900px) {
+  .ad-sidebar-zone { max-width: 100%; }
+}
+
+/* ============================================================
+   IN-ARTICLE — Mid-content banner
+   ============================================================ */
+
+.ad-in-article-zone {
+  position: relative;
+  width: 100%;
+  margin: 24px 0 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  padding-top: 20px;
+  text-align: center;
+}
+.ad-in-article-img {
+  display: block;
+  width: 100%;
+  max-width: 728px;
+  height: auto;
+  margin: 0 auto;
+  transition: opacity 0.2s ease;
+}
+@media (max-width: 768px) {
+  .ad-in-article-zone { margin: 16px 0 20px; }
+}
+
+/* ============================================================
+   FOOTER — Full-width banner above footer (full-bleed)
+   ============================================================ */
+
+.ad-footer-zone {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  transition: max-height 0.35s ease, opacity 0.35s ease;
+}
+.ad-footer-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+.ad-footer-zone a:hover .ad-footer-img { opacity: 0.92; }
+@media (max-width: 768px) {
+  .ad-footer-zone { height: 110px; }
+}
+@media (max-width: 480px) {
+  .ad-footer-zone { height: 80px; }
+}
+
 /* Common utilities */
 .text-center {
   text-align: center;
