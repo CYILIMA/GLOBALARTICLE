@@ -11,9 +11,13 @@
         </h1>
 
         <div class="article-meta">
-            <a href="{{ route('home', ['category' => $news->categoryData->slug ?? Str::slug($news->category)]) }}" class="article-category-link">
-                {{ $news->categoryData->name ?? $news->category }}
-            </a>
+            @if($news->categoryData)
+                <a href="{{ route('category.show', $news->categoryData) }}" class="article-category-link">
+                    {{ $news->categoryData->name }}
+                </a>
+            @else
+                <span class="article-category-link">{{ $news->category }}</span>
+            @endif
             <span class="article-meta-separator">&bull;</span>
             <time datetime="{{ $news->published_at ?? $news->created_at }}" class="article-meta-time">
                 {{ ($news->published_at ?? $news->created_at)->format('F d, Y • h:i A') }}

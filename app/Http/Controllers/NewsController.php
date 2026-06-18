@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\News;
 use App\Models\User;
 use App\Support\AllowedImageUploads;
@@ -12,21 +13,23 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
+        // SEO: old ?category= query links now resolve to the clean /{category} URL
+        if ($request->filled('category')) {
+            $category = Category::where('slug', $request->category)
+                ->orWhere('name', $request->category)
+                ->first();
+
+            if ($category) {
+                return redirect()->route('category.show', $category, 301);
+            }
+        }
+
         $query = News::with(['categoryData', 'author'])
             ->where('status', 'published')
             ->whereHas('categoryData', function($q) {
                 $q->where('slug', '!=', 'documentary');
             })
             ->latest();
-
-        // Filter by category slug or name if provided
-        if ($request->filled('category')) {
-            $categoryFilter = $request->category;
-            $query->whereHas('categoryData', function($q) use ($categoryFilter) {
-                $q->where('slug', $categoryFilter)
-                  ->orWhere('name', $categoryFilter);
-            });
-        }
 
         $news = $query->paginate(12);
 
@@ -56,9 +59,29 @@ class NewsController extends Controller
             ->sortByDesc('published_at')
             ->take(6);
 
-        $category = $request->category ?? null;
+        return view('home', compact('news', 'sidebarLatest', 'documentaries'));
+    }
 
-        return view('home', compact('news', 'sidebarLatest', 'documentaries', 'category'));
+    /**
+     * Clean-URL category page (e.g. /technology) — first-class landing page
+     * with its own title, description, paginated articles, and SEO metadata.
+     */
+    public function category(Category $category)
+    {
+        abort_if($category->slug === 'documentary', 404);
+
+        $news = News::with(['categoryData', 'author'])
+            ->where('status', 'published')
+            ->where('category_id', $category->id)
+            ->latest()
+            ->paginate(12);
+
+        $sidebarLatest = News::where('status', 'published')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('category', compact('category', 'news', 'sidebarLatest'));
     }
 
     public function show(News $news)

@@ -33,12 +33,14 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'color' => 'nullable|string|max:7',
+            'description' => 'nullable|string|max:500',
         ]);
 
         Category::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'color' => $request->color ?? '#3b82f6',
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
@@ -68,12 +70,14 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'color' => 'nullable|string|max:7',
+            'description' => 'nullable|string|max:500',
         ]);
 
         $category->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'color' => $request->color,
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');

@@ -153,3 +153,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// SEO: clean category URLs (e.g. /technology, /politics) — must stay last so it
+// doesn't swallow literal routes like /about, /dashboard, /login, etc.
+Route::get('/{category:slug}', [NewsController::class, 'category'])->name('category.show');

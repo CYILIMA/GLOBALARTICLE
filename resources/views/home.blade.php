@@ -5,11 +5,7 @@
 @section('content')
   <div class="container">
       <section id="newsArea">
-          @if(isset($category))
-              <h2>Category: {{ ucfirst($category) }}</h2>
-          @else
-              <h2 class="theme-strong-text">Latest News</h2>
-          @endif
+          <h2 class="theme-strong-text">Latest News</h2>
 
           @forelse($news as $item)
             <div class="news-card">
@@ -19,7 +15,11 @@
                     </a>
                 @endif
                 <div class="news-content">
-                    <a href="{{ route('home', ['category' => $item->categoryData->slug ?? Str::slug($item->category)]) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name ?? $item->category }}</small></a>
+                    @if($item->categoryData)
+                        <a href="{{ route('category.show', $item->categoryData) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name }}</small></a>
+                    @else
+                        <span class="category-link theme-strong-link"><small>{{ $item->category }}</small></span>
+                    @endif
                     <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                     <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                     <div style="margin-top: 10px; font-size: 13px; color: #555;">

@@ -11,6 +11,14 @@
             </div>
 
             <div class="mb-6">
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                <textarea name="description" id="description" rows="3" maxlength="500"
+                          placeholder="A short description shown on the category page and used for search engine results."
+                          class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-gray-100">{{ old('description') }}</textarea>
+                <p class="text-xs text-gray-400 mt-1">Used as the category page intro and SEO meta description.</p>
+            </div>
+
+            <div class="mb-6">
                 <label for="color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Badge Color (Hex)</label>
                 <div class="flex items-center gap-4">
                     <input type="color" name="color" id="color" value="#3b82f6" class="h-10 w-16 p-0 border-0 rounded cursor-pointer">

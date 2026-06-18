@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GLOBAL BREAKINGS | Breaking & Latest News</title>
+  <title>@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')</title>
+  <meta name="description" content="@yield('meta_description', 'Breaking news, in-depth analysis, and global perspective from Global Breakings — your trusted source for the stories that matter.')">
+  <link rel="canonical" href="{{ url()->current() }}">
   <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')">
+  <meta property="og:description" content="@yield('meta_description', 'Breaking news, in-depth analysis, and global perspective from Global Breakings — your trusted source for the stories that matter.')">
+  <meta property="og:url" content="{{ url()->current() }}">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!-- CSS FILE -->
   <link rel="stylesheet" href="{{ asset('css/CSSONLY.css') }}?v={{ time() }}">
@@ -53,12 +62,12 @@
 
     <nav class="desktop-nav">
       <ul>
-        <li><a href="{{ url('/') }}" class="theme-nav-link {{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/') }}" class="theme-nav-link {{ request()->routeIs('home') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
             @foreach($globalCategories->where('slug', '!=', 'documentary')->take(7) as $cat)
                 <li>
-                    <a href="{{ url('/?category=' . $cat->slug) }}"
-                       class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
+                    <a href="{{ route('category.show', $cat) }}"
+                       class="theme-nav-link {{ request()->routeIs('category.show') && request()->route('category')?->slug === $cat->slug ? 'active' : '' }}">
                        {{ strtoupper($cat->name) }}
                     </a>
                 </li>
@@ -69,8 +78,8 @@
                     <a href="#" class="nav-dropdown-trigger theme-nav-link">MORE</a>
                     <div class="nav-dropdown-content">
                         @foreach($globalCategories->where('slug', '!=', 'documentary')->skip(7) as $cat)
-                            <a href="{{ url('/?category=' . $cat->slug) }}"
-                               class="theme-nav-link {{ request('category') == $cat->slug ? 'active' : '' }}">
+                            <a href="{{ route('category.show', $cat) }}"
+                               class="theme-nav-link {{ request()->routeIs('category.show') && request()->route('category')?->slug === $cat->slug ? 'active' : '' }}">
                                 {{ $cat->name }}
                             </a>
                         @endforeach
@@ -110,12 +119,12 @@
         <div class="close-btn" onclick="toggleMenu()">✕</div>
       </div>
       <ul>
-        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') && !request()->has('category') ? 'active' : '' }}">HOME</a></li>
+        <li><a href="{{ url('/') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">HOME</a></li>
         @if(isset($globalCategories))
-            @foreach($globalCategories as $cat)
+            @foreach($globalCategories->where('slug', '!=', 'documentary') as $cat)
                 <li>
-                    <a href="{{ url('/?category=' . $cat->slug) }}"
-                       class="{{ request('category') == $cat->slug ? 'active' : '' }}">
+                    <a href="{{ route('category.show', $cat) }}"
+                       class="{{ request()->routeIs('category.show') && request()->route('category')?->slug === $cat->slug ? 'active' : '' }}">
                        {{ strtoupper($cat->name) }}
                     </a>
                 </li>
@@ -233,7 +242,7 @@
         <div class="footer-links-grid">
             @if(isset($globalCategories))
                 @foreach($globalCategories->where('slug', '!=', 'documentary') as $cat)
-                    <a href="{{ url('/?category=' . $cat->slug) }}">{{ $cat->name }}</a>
+                    <a href="{{ route('category.show', $cat) }}">{{ $cat->name }}</a>
                 @endforeach
             @else
                 <p class="text-sm text-gray-500">Categories unavailable</p>
