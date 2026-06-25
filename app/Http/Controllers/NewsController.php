@@ -19,9 +19,21 @@ class NewsController extends Controller
             })
             ->latest();
 
+        // Redirect legacy query-string category URLs to clean category paths
+        $queryCategory = $request->category;
+        $routeCategory = $request->route('category');
+        if ($queryCategory && !$routeCategory) {
+            $legacyCategory = \App\Models\Category::where('slug', $queryCategory)
+                ->orWhere('name', $queryCategory)
+                ->first();
+            if ($legacyCategory) {
+                return redirect()->route('category.show', $legacyCategory->slug, 301);
+            }
+        }
+
         // Filter by category slug or name if provided
-        if ($request->filled('category')) {
-            $categoryFilter = $request->category;
+        $categoryFilter = $routeCategory ?? $queryCategory;
+        if ($categoryFilter) {
             $query->whereHas('categoryData', function($q) use ($categoryFilter) {
                 $q->where('slug', $categoryFilter)
                   ->orWhere('name', $categoryFilter);
@@ -56,7 +68,7 @@ class NewsController extends Controller
             ->sortByDesc('published_at')
             ->take(6);
 
-        $category = $request->category ?? null;
+        $category = $routeCategory ?? $queryCategory;
 
         return view('home', compact('news', 'sidebarLatest', 'documentaries', 'category'));
     }
@@ -94,7 +106,7 @@ class NewsController extends Controller
         $articles = News::published()
             ->where('user_id', $author->id)
             ->latest()
-            ->paginate(12);
+            ->get();
 
         $sidebarLatest = News::published()->latest()->take(5)->get();
 

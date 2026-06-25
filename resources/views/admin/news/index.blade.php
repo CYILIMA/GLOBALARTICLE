@@ -90,6 +90,9 @@
                 @endforeach
             </tbody>
         </table>
+        <div class="px-4 py-4 border-t" style="border-color: var(--border-color)">
+            {{ $latestArticles->appends(request()->query())->links() }}
+        </div>
         @else
             <div class="p-12 text-center text-gray-500 dark:text-gray-400">
                 No articles found matching this criteria.

@@ -12,7 +12,7 @@
         </h1>
 
         <div class="article-meta">
-            <a href="{{ route('home', ['category' => $news->categoryData->slug ?? Str::slug($news->category)]) }}" class="article-category-link">
+            <a href="{{ route('category.show', $news->categoryData->slug ?? Str::slug($news->category)) }}" class="article-category-link">
                 {{ $news->categoryData->name ?? $news->category }}
             </a>
             <span class="article-meta-separator">&bull;</span>

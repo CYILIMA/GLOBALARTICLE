@@ -3,10 +3,10 @@
 @section('main_class', 'home-main')
 
 @section('content')
-  <div class="container {{ request()->filled('category') ? 'category-layout' : '' }}">
+  <div class="container {{ isset($category) || request()->route('category') ? 'category-layout' : '' }}">
       <section id="newsArea">
           @if(isset($category))
-              <h2>Category: {{ ucfirst($category) }}</h2>
+              <h2>{{ ucfirst($category) }}</h2>
           @else
               <h2 class="theme-strong-text">Latest News</h2>
           @endif
@@ -17,7 +17,7 @@
                     <img src="{{ $item->image ? asset('storage/' . $item->image) : asset('images/logo1.png') }}" alt="{{ $item->title }}" loading="lazy">
                 </a>
                 <div class="news-content">
-                    <a href="{{ route('home', ['category' => $item->categoryData->slug ?? Str::slug($item->category)]) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name ?? $item->category }}</small></a>
+                    <a href="{{ route('category.show', $item->categoryData->slug ?? Str::slug($item->category)) }}" class="category-link theme-strong-link"><small>{{ $item->categoryData->name ?? $item->category }}</small></a>
                     <h3><a href="{{ route('news.show', $item) }}">{{ $item->title }}</a></h3>
                     <p>{{ Str::limit(strip_tags($item->content), 150) }}</p>
                     <div class="news-meta">

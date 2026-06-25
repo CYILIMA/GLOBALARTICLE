@@ -46,6 +46,7 @@ Route::get('/documentaries', [DocumentaryController::class, 'index'])->name('doc
 Route::get('/documentaries/{documentary}', [DocumentaryController::class, 'show'])->name('documentaries.show');
 Route::get('/about', fn() => view('pages.about'))->name('about');
 Route::get('/contact', fn() => view('pages.contact'))->name('contact');
+Route::get('/contact_us', fn() => view('pages.contact'))->name('contact.alias');
 Route::get('/terms', fn() => view('pages.terms'))->name('terms');
 Route::get('/privacy', fn() => view('pages.privacy'))->name('privacy');
 Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -146,3 +147,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/{category}', [NewsController::class, 'index'])->where('category', '[A-Za-z0-9\-]+')->name('category.show');
