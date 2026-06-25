@@ -2,7 +2,7 @@
     @section('header', 'Manage Articles')
 
     <div class="rounded-lg shadow-sm overflow-hidden border transition-colors" style="background: var(--sidebar-bg); border-color: var(--border-color)">
-        
+
         <!-- Toolbar -->
         <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-4" style="background: var(--sidebar-hover); border-color: var(--border-color)">
             <div class="flex gap-2">
