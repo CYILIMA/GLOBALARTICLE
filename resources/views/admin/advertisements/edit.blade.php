@@ -194,14 +194,12 @@
 
                 {{-- Submit row --}}
                 <div class="flex items-center justify-between gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
-                    <form method="POST" action="{{ route('admin.advertisements.destroy', $advertisement) }}"
-                          onsubmit="return confirm('Permanently delete this advertisement?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-sm text-red-500 dark:text-red-400 hover:underline font-medium">
+                    <div>
+                        <button type="button" onclick="document.getElementById('deleteForm').submit()"
+                                class="text-sm text-red-500 dark:text-red-400 hover:underline font-medium">
                             Delete this ad
                         </button>
-                    </form>
+                    </div>
                     <div class="flex items-center gap-4">
                         <a href="{{ route('admin.advertisements.index') }}"
                            class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition">
@@ -218,6 +216,14 @@
                 </div>
             </form>
         </div>
+
+        {{-- Delete form (separate from update form) --}}
+        <form id="deleteForm" method="POST" action="{{ route('admin.advertisements.destroy', $advertisement) }}"
+              style="display: none;"
+              onsubmit="return confirm('Permanently delete this advertisement?');">
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
 
     @push('scripts')
