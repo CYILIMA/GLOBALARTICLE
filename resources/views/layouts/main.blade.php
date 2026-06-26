@@ -22,20 +22,43 @@
   <style>
     :root {
       --top-bar-height: 68px;
+      --breaking-banner-height: 0px;
     }
-    .top-bar {
+    body.has-breaking-banner,
+    body.has-success-banner {
+      --breaking-banner-height: 40px;
+    }
+    .top-fixed-stack {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;
       width: 100% !important;
       z-index: 9999 !important;
+      border-bottom: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .top-bar,
+    .breaking-banner {
+      position: static !important;
+      width: 100% !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .top-bar {
+      border-bottom: none !important;
+    }
+    .breaking-banner {
+      margin: 0 !important;
+      padding: 0 !important;
     }
     body {
-      padding-top: var(--top-bar-height) !important;
+      padding-top: calc(var(--top-bar-height) + var(--breaking-banner-height)) !important;
     }
     .ad-leaderboard-zone {
-      margin-top: var(--top-bar-height) !important;
+      margin-top: 0 !important;
     }
   </style>
 
@@ -86,7 +109,8 @@
   </div>
   @endif
 
-  <div class="top-bar">
+  <div class="top-fixed-stack">
+    <div class="top-bar">
     <div class="logo" onclick="window.location='{{ url('/') }}'">
       <img src="{{ asset('images/logo1.png') }}" alt="Global Breakings" class="logo-icon">
       <span class="logo-main">GLOBAL</span>
@@ -207,6 +231,7 @@
       </div>
   </div>
   @endif
+  </div>
 </header>
 
 @if(session('success') || session('error') || $errors->any())

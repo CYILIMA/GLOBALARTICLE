@@ -57,6 +57,7 @@ html.dark {
 
 :root {
   --top-bar-height: 68px;
+  --breaking-banner-height: 0px;
 }
 
 body {
@@ -64,11 +65,12 @@ body {
   color: var(--text-main);
   line-height: 1.6;
   overflow-x: hidden;
-  padding-top: var(--top-bar-height);
+  padding-top: calc(var(--top-bar-height) + var(--breaking-banner-height));
 }
 
 body.has-breaking-banner,
 body.has-success-banner {
+  --breaking-banner-height: 40px;
   --site-header-height: 0;
 }
 
@@ -112,7 +114,7 @@ html.dark .nav-dropdown-trigger:hover {
 /* HEADER */
 body>header {
   background: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: none;
   position: static;
   width: 100%;
   z-index: 2000;
@@ -138,7 +140,8 @@ body>header {
 .ad-leaderboard-zone {
   position: relative;
   z-index: 1000;
-  margin-top: var(--top-bar-height) !important;
+  margin-top: 0 !important;
+  border-top: none;
 }
 
 .logo {
@@ -410,10 +413,14 @@ body>header {
   height: 40px;
   display: flex;
   align-items: center;
-  z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: var(--top-bar-height);
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9998;
+  border-bottom: none;
   overflow: hidden;
-  position: relative;
 }
 
 .breaking-label-container {
@@ -2646,9 +2653,29 @@ footer {
 @media (max-width: 768px) {
   .ad-leaderboard-zone { height: 140px; }
   .ad-label-tag { display: none; }
+  .ad-banner-img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
 }
 @media (max-width: 480px) {
-  .ad-leaderboard-zone { height: 90px; }
+  .ad-leaderboard-zone { height: 120px; }
+  .ad-banner-img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
+  .top-fixed-stack,
+  .top-bar,
+  .breaking-banner {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+  .breaking-banner {
+    height: auto !important;
+  }
 }
 
 /* ============================================================
