@@ -14,6 +14,7 @@ use App\Http\Controllers\CommentModerationController;
 use App\Http\Controllers\DocumentaryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\DocumentaryManagementController;
+use App\Http\Controllers\Admin\AdvertisementController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -52,6 +53,8 @@ Route::get('/privacy', fn() => view('pages.privacy'))->name('privacy');
 Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('/subscribe', [SubscriberController::class, 'store'])->name('subscribe');
 Route::get('/unsubscribe', [SubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+Route::get('/ads/{advertisement}/click', [AdvertisementController::class, 'click'])->name('ads.click');
+Route::post('/ads/{advertisement}/impression', [AdvertisementController::class, 'impression'])->name('ads.impression');
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -129,6 +132,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/media/upload', [MediaController::class, 'store'])->name('admin.media.store');
         Route::delete('/media/{id}', [MediaController::class, 'destroy'])->name('admin.media.destroy');
         Route::post('/media/folder', [MediaController::class, 'createFolder'])->name('admin.media.folder.create');
+
+        // Advertisements
+        Route::resource('/advertisements', AdvertisementController::class)->except(['show'])->names([
+            'index'   => 'admin.advertisements.index',
+            'create'  => 'admin.advertisements.create',
+            'store'   => 'admin.advertisements.store',
+            'edit'    => 'admin.advertisements.edit',
+            'update'  => 'admin.advertisements.update',
+            'destroy' => 'admin.advertisements.destroy',
+        ]);
     });
 
     // Shared Notifications

@@ -13,4 +13,14 @@
              <li style="color: var(--text-muted); font-style: italic; padding: 10px 0;">No latest articles found.</li>
         @endforelse
     </ul>
+
+    {{-- Sidebar Rectangle Ad --}}
+    @if(!empty($globalSidebarAds))
+    <div class="ad-sidebar-zone" id="adSidebar"
+         data-ads="{{ json_encode($globalSidebarAds) }}"
+         data-img-class="ad-sidebar-img">
+        <span class="ad-label-tag">Advertisement</span>
+        <div class="ad-rotator-slot"></div>
+    </div>
+    @endif
 </aside>

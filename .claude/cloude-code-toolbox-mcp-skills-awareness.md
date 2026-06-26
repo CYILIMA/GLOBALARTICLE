@@ -1,6 +1,6 @@
 # Cloude Code ToolBox — MCP & Skills awareness
 
-_Generated: 2026-05-09T12:24:25.057Z_
+_Generated: 2026-06-13T10:18:27.121Z_
 
 ## How to use this report
 
@@ -15,9 +15,11 @@ _Generated: 2026-05-09T12:24:25.057Z_
 
 Workspace `mcp.json` _(folder: GLOBALARTICLE)_
 
-- **d:\GLOBALARTICLE\.mcp.json** — _File missing_
+- **d:\GLOBALARTICLE\.mcp.json** — _File exists — servers defined_
 
-_No active workspace servers in mcp.json._
+| Server id | Kind | Detail |
+|-----------|------|--------|
+| jetro | stdio | C:\Users\davide\.jetro\runtime\node-win32-x64.exe C:\Users\davide\.jetro\mcp-server\index.js |
 
 ## MCP — user profile
 

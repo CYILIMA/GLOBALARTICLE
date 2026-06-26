@@ -5,6 +5,7 @@
   <title>@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')</title>
   <meta name="description" content="@yield('meta_description', 'Global Breakings brings you the latest breaking news from around the world.')" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <meta property="og:title" content="@yield('title', 'GLOBAL BREAKINGS | Breaking & Latest News')" />
   <meta property="og:description" content="@yield('meta_description', 'Global Breakings brings you the latest breaking news from around the world.')" />
@@ -142,6 +143,17 @@
     </nav>
   </div>
 
+  @if(!empty($globalHeaderAds))
+  <div class="ad-leaderboard-zone" id="adLeaderboard"
+       data-ads="{{ json_encode($globalHeaderAds) }}"
+       data-img-class="ad-banner-img"
+       data-link-class="ad-banner-link">
+      <span class="ad-label-tag">Advertisement</span>
+      <div class="ad-rotator-slot"></div>
+      <button class="ad-close-btn" onclick="dismissAd('adLeaderboard')" title="Close advertisement" aria-label="Close advertisement">✕</button>
+  </div>
+  @endif
+
   @if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
   @php $bannerStory = $globalBreakingNews->first(); @endphp
   <div class="breaking-banner">
@@ -207,6 +219,17 @@
 <main class="@yield('main_class', 'container')">
     @yield('content')
 </main>
+
+{{-- Footer Banner Ad --}}
+@if(!empty($globalFooterAds))
+<div class="ad-footer-zone" id="adFooter"
+     data-ads="{{ json_encode($globalFooterAds) }}"
+     data-img-class="ad-footer-img">
+    <span class="ad-label-tag">Advertisement</span>
+    <div class="ad-rotator-slot"></div>
+    <button class="ad-close-btn" onclick="dismissAd('adFooter')" title="Close" aria-label="Close advertisement">✕</button>
+</div>
+@endif
 
 <footer>
   <div class="subscribe-container" id="subscribeSection">
@@ -287,5 +310,66 @@
 <!-- Main Layout Scripts -->
 <script src="{{ asset('js/main-layout.js') }}"></script>
 <script src="{{ asset('js/auto-embed.js') }}"></script>
+<script>
+    function dismissAd(id) {
+        const ad = document.getElementById(id);
+        if (ad) {
+            ad.style.overflow = 'hidden';
+            ad.style.maxHeight = ad.scrollHeight + 'px';
+            ad.offsetHeight;
+            ad.classList.add('ad-dismissed');
+            setTimeout(() => ad.remove(), 350);
+        }
+    }
+
+    class AdRotator {
+        constructor(zone) {
+            this.zone = zone;
+            try { this.ads = JSON.parse(zone.dataset.ads || '[]'); } catch(e) { this.ads = []; }
+            this.slot = zone.querySelector('.ad-rotator-slot');
+            this.imgClass  = zone.dataset.imgClass  || '';
+            this.linkClass = zone.dataset.linkClass || '';
+            this.index = 0;
+            if (!this.slot || !this.ads.length) { zone.style.display = 'none'; return; }
+            this.show(0);
+            if (this.ads.length > 1) {
+                setInterval(() => {
+                    this.index = (this.index + 1) % this.ads.length;
+                    this.rotate();
+                }, 7000);
+            }
+        }
+        show(i) {
+            const ad = this.ads[i];
+            const e = s => String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const img = `<img src="${e(ad.image_url)}" alt="${e(ad.title)}" class="${this.imgClass}" loading="lazy">`;
+            const lc = this.linkClass ? ` class="${this.linkClass}"` : '';
+            this.slot.innerHTML = ad.click_url
+                ? `<a href="${e(ad.click_url)}" target="_blank" rel="noopener sponsored nofollow"${lc}>${img}</a>`
+                : `<div${lc}>${img}</div>`;
+            this.trackImpression(ad);
+        }
+        rotate() {
+            this.slot.style.opacity = '0';
+            setTimeout(() => {
+                this.show(this.index);
+                this.slot.style.opacity = '1';
+            }, 200);
+        }
+        trackImpression(ad) {
+            if (!ad.imp_url) return;
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            fetch(ad.imp_url, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                credentials: 'same-origin'
+            }).catch(() => {});
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-ads]').forEach(zone => new AdRotator(zone));
+    });
+</script>
 </body>
 </html>

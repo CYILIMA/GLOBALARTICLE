@@ -374,6 +374,16 @@
                 </a>
                 @endif
 
+                <!-- BUSINESS SECTION -->
+                @if(auth()->user()->role === 'admin')
+                <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">
+                    Business
+                </div>
+                <a href="{{ route('admin.advertisements.index') }}" class="{{ request()->routeIs('admin.advertisements.*') ? 'active' : '' }}">
+                    📢 Advertisements
+                </a>
+                @endif
+
                 <!-- ADMINISTRATION SECTION -->
                 @if(auth()->user()->role === 'admin')
                 <div class="mt-8 px-5 py-2 text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">

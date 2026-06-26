@@ -31,7 +31,7 @@ To use a template, call `jet_template({ name: "Template Name" })` to fetch the f
 
 ### MCP & Skills awareness (Cloude Code ToolBox)
 
-_Last synced: 2026-05-09T12:24:25.206Z._
+_Last synced: 2026-06-13T10:18:27.227Z._
 
 - **Full report:** `.claude/cloude-code-toolbox-mcp-skills-awareness.md` in this workspace (auto-overwritten on each scan). Use it as ground truth for configured servers and skill folders.
 - **MCP:** For **live tools** in Claude Code, enable the matching server via `/mcp`. Servers are configured in `~/.claude.json` (user) and `.mcp.json` (project).
@@ -40,9 +40,11 @@ _Last synced: 2026-05-09T12:24:25.206Z._
 
 #### Workspace MCP
 
-- `d:\GLOBALARTICLE\.mcp.json` _(workspace: GLOBALARTICLE)_ — _file missing_
+- `d:\GLOBALARTICLE\.mcp.json` _(workspace: GLOBALARTICLE)_ — _servers defined_
 
-_No active workspace servers in mcp.json._
+| Server id | Kind | Detail |
+|-----------|------|--------|
+| jetro | stdio | C:\Users\davide\.jetro\runtime\node-win32-x64.exe C:\Users\davide\.jetro\mcp-server\index.js |
 
 #### User MCP
 
