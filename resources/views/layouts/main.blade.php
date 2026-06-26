@@ -56,6 +56,17 @@
 <body class="@if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0) has-breaking-banner @elseif(session('success')) has-success-banner @endif">
 
 <header>
+  @if(!empty($globalHeaderAds))
+  <div class="ad-leaderboard-zone" id="adLeaderboard"
+       data-ads="{{ json_encode($globalHeaderAds) }}"
+       data-img-class="ad-banner-img"
+       data-link-class="ad-banner-link">
+      <span class="ad-label-tag">Advertisement</span>
+      <div class="ad-rotator-slot"></div>
+      <button class="ad-close-btn" onclick="dismissAd('adLeaderboard')" title="Close advertisement" aria-label="Close advertisement">✕</button>
+  </div>
+  @endif
+
   <div class="top-bar">
     <div class="logo" onclick="window.location='{{ url('/') }}'">
       <img src="{{ asset('images/logo1.png') }}" alt="Global Breakings" class="logo-icon">
@@ -142,17 +153,6 @@
       </ul>
     </nav>
   </div>
-
-  @if(!empty($globalHeaderAds))
-  <div class="ad-leaderboard-zone" id="adLeaderboard"
-       data-ads="{{ json_encode($globalHeaderAds) }}"
-       data-img-class="ad-banner-img"
-       data-link-class="ad-banner-link">
-      <span class="ad-label-tag">Advertisement</span>
-      <div class="ad-rotator-slot"></div>
-      <button class="ad-close-btn" onclick="dismissAd('adLeaderboard')" title="Close advertisement" aria-label="Close advertisement">✕</button>
-  </div>
-  @endif
 
   @if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
   @php $bannerStory = $globalBreakingNews->first(); @endphp
