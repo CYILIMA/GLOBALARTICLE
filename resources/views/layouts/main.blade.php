@@ -19,6 +19,25 @@
 
   <!-- CSS FILE -->
   <link rel="stylesheet" href="{{ asset('css/CSSONLY.css') }}?v={{ time() }}">
+  <style>
+    :root {
+      --top-bar-height: 68px;
+    }
+    .top-bar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      z-index: 9999 !important;
+    }
+    body {
+      padding-top: var(--top-bar-height) !important;
+    }
+    .ad-leaderboard-zone {
+      margin-top: var(--top-bar-height) !important;
+    }
+  </style>
 
   <!-- Tailwind CSS Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
