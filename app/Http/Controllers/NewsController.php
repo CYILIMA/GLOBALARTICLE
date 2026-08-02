@@ -16,8 +16,13 @@ class NewsController extends Controller
             ->where('status', 'published')
             ->whereHas('categoryData', function($q) {
                 $q->where('slug', '!=', 'documentary');
-            })
-            ->latest();
+            });
+
+        // Filter by language from session
+        $language = session('news_language', 'english');
+        $query->where('language', $language);
+
+        $query->latest();
 
         // Redirect legacy query-string category URLs to clean category paths
         $queryCategory = $request->category;
@@ -42,13 +47,14 @@ class NewsController extends Controller
 
         $news = $query->paginate(12);
 
-        // Get latest news for sidebar
+        // Get latest news for sidebar (filter by selected language)
         $sidebarLatest = News::where('status', 'published')
+            ->where('language', $language)
             ->latest()
             ->take(5)
             ->get();
 
-        // Get unified documentaries for home page
+        // Get unified documentaries for home page (with language filter)
         $traditionalDocs = \App\Models\Documentary::published()
             ->latest()
             ->with('author')
@@ -56,6 +62,7 @@ class NewsController extends Controller
             ->get();
 
         $newsDocs = \App\Models\News::published()
+            ->where('language', $language)
             ->whereHas('categoryData', function($q) {
                 $q->where('slug', 'documentary');
             })
@@ -132,6 +139,7 @@ class NewsController extends Controller
             'image_source' => 'nullable|string|max:255',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
+            'language' => 'required|in:english,kinyarwanda,french',
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -174,6 +182,7 @@ class NewsController extends Controller
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
             'status' => $request->status,
+            'language' => $request->language,
             'published_at' => $request->published_at ?? ($request->status == 'published' ? now() : null),
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
@@ -229,6 +238,7 @@ class NewsController extends Controller
             'image_source' => 'nullable|string|max:255',
             'breaking' => 'boolean',
             'status' => 'required|in:draft,published,scheduled,archived',
+            'language' => 'required|in:english,kinyarwanda,french',
             'published_at' => 'nullable|date',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
@@ -279,6 +289,7 @@ class NewsController extends Controller
             'breaking' => $request->has('breaking') ? 1 : 0,
             'breaking_expires_at' => $request->has('breaking') ? $expiresAt : null,
             'status' => $request->status,
+            'language' => $request->language,
             'published_at' => $request->published_at ?? ($request->status == 'published' && !$news->published_at ? now() : $news->published_at),
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
@@ -342,5 +353,16 @@ class NewsController extends Controller
             'success' => 0,
             'message' => 'No image uploaded'
         ], 400);
+    }
+
+    public function setLanguage(Request $request)
+    {
+        $validated = $request->validate([
+            'language' => 'required|in:english,kinyarwanda,french'
+        ]);
+
+        session(['news_language' => $validated['language']]);
+
+        return redirect()->back();
     }
 }

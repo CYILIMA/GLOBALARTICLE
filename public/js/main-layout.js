@@ -1,37 +1,10 @@
 /**
  * Main Layout JavaScript
- * Handles theme toggling and subscription form submission
+ * Handles subscription form submission
  */
 
-// Theme Toggle Logic
+// Subscription Form Handler
 document.addEventListener('DOMContentLoaded', function () {
-    const toggleBtn = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const html = document.documentElement;
-
-    // Load saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        html.classList.add('dark');
-        themeIcon.textContent = '☀️';
-    } else {
-        html.classList.remove('dark');
-        themeIcon.textContent = '🌙';
-    }
-
-    // Theme toggle event
-    toggleBtn.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        if (html.classList.contains('dark')) {
-            localStorage.setItem('theme', 'dark');
-            themeIcon.textContent = '☀️';
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeIcon.textContent = '🌙';
-        }
-    });
-
-    // Subscription Form Handler
     const subscribeForm = document.getElementById('subscribeForm');
     if (subscribeForm) {
         subscribeForm.addEventListener('submit', async function (e) {

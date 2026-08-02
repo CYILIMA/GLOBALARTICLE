@@ -60,6 +60,99 @@
     .ad-leaderboard-zone {
       margin-top: 0 !important;
     }
+
+    /* Language Selector Styles */
+    .language-selector-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .language-form {
+      margin-right: 15px;
+    }
+
+    .language-select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background-color: white;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .language-select:hover {
+      border-color: #7c3aed;
+      background-color: #f9f5ff;
+    }
+
+    .language-select:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+
+    /* Dark mode support */
+    body.dark .language-select {
+      background-color: #2d2d2d;
+      color: #f5f5f5;
+      border-color: #444;
+    }
+
+    body.dark .language-select:hover {
+      border-color: #7c3aed;
+      background-color: #3a3a3a;
+    }
+
+    /* Mobile Language Selector Styles */
+    .mobile-language-selector {
+      padding: 15px;
+      border-top: 1px solid #e5e7eb;
+      margin-top: 15px;
+    }
+
+    body.dark .mobile-language-selector {
+      border-top-color: #444;
+    }
+
+    .mobile-language-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    body.dark .mobile-language-label {
+      color: #e5e7eb;
+    }
+
+    .mobile-language-select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      background-color: white;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .mobile-language-select:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+
+    body.dark .mobile-language-select {
+      background-color: #2d2d2d;
+      color: #f5f5f5;
+      border-color: #444;
+    }
   </style>
 
   <!-- Tailwind CSS Play CDN -->
@@ -154,10 +247,19 @@
     </nav>
 
     <div class="header-right">
-        <!-- Theme Toggle -->
-        <button id="themeToggle" class="theme-toggle-btn" title="Toggle Theme">
-            <span id="themeIcon">🌙</span>
-        </button>
+        <!-- Language Selector -->
+        <div class="language-selector-wrapper">
+            @php($selectedLanguage = session('news_language', 'english'))
+            <form action="{{ route('news.language') }}" method="POST" class="language-form" id="languageForm">
+                @csrf
+                <label for="languageSelect" class="sr-only">Select Language</label>
+                <select id="languageSelect" name="language" class="language-select" onchange="document.getElementById('languageForm').submit()" title="Choose article language">
+                    <option value="english" {{ $selectedLanguage === 'english' ? 'selected' : '' }}>English</option>
+                    <option value="kinyarwanda" {{ $selectedLanguage === 'kinyarwanda' ? 'selected' : '' }}>Kinyarwanda</option>
+                    <option value="french" {{ $selectedLanguage === 'french' ? 'selected' : '' }}>Français</option>
+                </select>
+            </form>
+        </div>
 
         <!-- Hamburger -->
         <div class="hamburger" onclick="toggleMenu()">☰</div>
@@ -194,43 +296,56 @@
             </li>
         @endif
       </ul>
+
+      <!-- Mobile Language Selector -->
+      <div class="mobile-language-selector">
+        @php($selectedLanguage = session('news_language', 'english'))
+        <form action="{{ route('news.language') }}" method="POST" class="mobile-language-form">
+          @csrf
+          <label for="mobileLanguageSelect" class="mobile-language-label">Select Language</label>
+          <select id="mobileLanguageSelect" name="language" class="mobile-language-select" onchange="this.form.submit()">
+            <option value="english" {{ $selectedLanguage === 'english' ? 'selected' : '' }}>English</option>
+            <option value="kinyarwanda" {{ $selectedLanguage === 'kinyarwanda' ? 'selected' : '' }}>Kinyarwanda</option>
+            <option value="french" {{ $selectedLanguage === 'french' ? 'selected' : '' }}>Français</option>
+          </select>
+        </form>
+      </div>
     </nav>
   </div>
 
-  @if(isset($globalBreakingNews) && $globalBreakingNews->count() > 0)
-  @php $bannerStory = $globalBreakingNews->first(); @endphp
-  <div class="breaking-banner">
-    <div class="breaking-label-container">
-        <span class="breaking-pulse">🔴</span>
-        <span class="breaking-label-new">BREAKING</span>
+  <div class="breaking-container">
+    @if(isset($globalBreakingNews) && count($globalBreakingNews) > 0)
+    <div class="breaking-banner">
+      <div class="breaking-label-container">
+          <span class="breaking-pulse">🔴</span>
+          <span class="breaking-label-new">BREAKING</span>
+      </div>
+      <div class="breaking-marquee">
+          <div class="breaking-track">
+              @foreach($globalBreakingNews as $news)
+                  <a href="{{ route('news.show', $news) }}" class="breaking-item">
+                      <span class="breaking-title">{{ $news->title }}</span>
+                      <span class="breaking-cta">Read More →</span>
+                  </a>
+                  <span class="breaking-separator">|</span>
+              @endforeach
+              @foreach($globalBreakingNews as $news)
+                  <a href="{{ route('news.show', $news) }}" class="breaking-item">
+                      <span class="breaking-title">{{ $news->title }}</span>
+                      <span class="breaking-cta">Read More →</span>
+                  </a>
+                  <span class="breaking-separator">|</span>
+              @endforeach
+          </div>
+      </div>
     </div>
-    <div class="breaking-marquee">
-        <div class="breaking-track">
-            @foreach($globalBreakingNews as $news)
-                <a href="{{ route('news.show', $news) }}" class="breaking-item">
-                    <span class="breaking-title">{{ $news->title }}</span>
-                    <span class="breaking-cta">Read More →</span>
-                </a>
-                <span class="breaking-separator">|</span>
-            @endforeach
-            <!-- Duplicate content for seamless infinite scroll -->
-            @foreach($globalBreakingNews as $news)
-                <a href="{{ route('news.show', $news) }}" class="breaking-item">
-                    <span class="breaking-title">{{ $news->title }}</span>
-                    <span class="breaking-cta">Read More →</span>
-                </a>
-                <span class="breaking-separator">|</span>
-            @endforeach
+    @elseif(session('success'))
+    <div class="breaking-success">
+        <div class="success-banner">
+            {{ session('success') }}
         </div>
     </div>
-  </div>
-  @elseif(session('success'))
-  <div class="breaking-success">
-      <div class="success-banner">
-          {{ session('success') }}
-      </div>
-  </div>
-  @endif
+    @endif
   </div>
 </header>
 

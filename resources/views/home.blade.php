@@ -8,7 +8,18 @@
           @if(isset($category))
               <h2>{{ ucfirst($category) }}</h2>
           @else
-              <h2 class="theme-strong-text">Latest News</h2>
+              <h2 class="theme-strong-text">
+                  @php
+                      $language = session('news_language', 'english');
+                  @endphp
+                  @if($language === 'kinyarwanda')
+                      AMAKURU MASHYA
+                  @elseif($language === 'french')
+                      Dernières Nouvelles
+                  @else
+                      Latest News
+                  @endif
+              </h2>
           @endif
 
           @forelse($news as $item)

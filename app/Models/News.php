@@ -23,6 +23,7 @@ class News extends Model
         'image_source',
         'breaking',
         'status',
+        'language',
         'published_at',
         'scheduled_at',
         'breaking_expires_at',

@@ -53,6 +53,7 @@ Route::get('/privacy', fn() => view('pages.privacy'))->name('privacy');
 Route::post('/news/{news}/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('/subscribe', [SubscriberController::class, 'store'])->name('subscribe');
 Route::get('/unsubscribe', [SubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+Route::post('/language', [NewsController::class, 'setLanguage'])->name('news.language');
 Route::get('/ads/{advertisement}/click', [AdvertisementController::class, 'click'])->name('ads.click');
 Route::post('/ads/{advertisement}/impression', [AdvertisementController::class, 'impression'])->name('ads.impression');
 

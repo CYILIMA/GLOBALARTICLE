@@ -1,6 +1,17 @@
 {{-- Sidebar Component --}}
 <aside class="sidebar">
-    <h3 class="theme-strong-text">Recent Headlines</h3>
+    <h3 class="theme-strong-text">
+        @php
+            $language = session('news_language', 'english');
+        @endphp
+        @if($language === 'kinyarwanda')
+            INGINGO NYAMUKURU
+        @elseif($language === 'french')
+            Titres Récents
+        @else
+            Recent Headlines
+        @endif
+    </h3>
     <ul id="latestNews">
         @forelse($sidebarLatest ?? [] as $latest)
             <li>

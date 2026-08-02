@@ -93,6 +93,18 @@
                     </div>
                 </div>
 
+                <!-- Language Selection -->
+                <div>
+                    <label for="language" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Article Language</label>
+                    <select name="language" id="language" required
+                            class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:text-white">
+                        <option value="english" {{ old('language', $news->language ?? 'english') == 'english' ? 'selected' : '' }}>English</option>
+                        <option value="kinyarwanda" {{ old('language', $news->language ?? 'english') == 'kinyarwanda' ? 'selected' : '' }}>Kinyarwanda</option>
+                        <option value="french" {{ old('language', $news->language ?? 'english') == 'french' ? 'selected' : '' }}>Français (French)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Select the language in which this article is written. This will determine which audience sees this article on the frontend.</p>
+                </div>
+
                 <!-- Block Editor -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Article Content</label>
