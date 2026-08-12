@@ -886,11 +886,13 @@ body>header {
   margin-top: 40px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1025px) {
   .sidebar {
+    /* Stay in the right grid column, then lock below the fixed header on scroll. */
     position: sticky;
     top: calc(var(--top-bar-height) + 24px);
     align-self: start;
+    margin-top: 0;
   }
 }
 
